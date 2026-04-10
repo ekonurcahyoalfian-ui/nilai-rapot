@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>SMP IIBS Ar-Rahman — Nilai Rapot</title>
+<link rel="icon" type="image/png" href="https://i.imgur.com/omtDTAj.png">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#1a6fdb;--blue-dark:#1155b0;--blue-light:#e8f0fd;
+  --green:#0e7c5b;--green-light:#e6f4ef;
+  --red:#c0392b;--red-light:#fdf0ef;
+  --amber:#c47a0a;--amber-light:#fdf5e6;
+  --text:#1a1a2e;--text2:#5a5a7a;--text3:#9595a8;
+  --bg:#f4f5f9;--border:#e2e4ec;
+  --radius:10px;--radius-lg:14px;
+  --shadow:0 1px 4px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.05);
+}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
+#loginView{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:1.5rem;flex-direction:column}
+.login-wrap{width:100%;max-width:420px}
+.school-hdr{display:flex;align-items:center;gap:14px;justify-content:center;margin-bottom:2rem}
+.school-logo{width:64px;height:64px;border-radius:12px;object-fit:cover;border:2px solid var(--border)}
+.school-hdr h2{font-size:18px;font-weight:700}
+.school-hdr p{font-size:12px;color:var(--text2);margin-top:2px}
+.login-card{background:#fff;border-radius:var(--radius-lg);box-shadow:var(--shadow);padding:2rem}
+.login-title{font-size:15px;font-weight:700;margin-bottom:1.25rem;text-align:center}
+.role-tabs{display:flex;gap:6px;margin-bottom:1.25rem;background:var(--bg);border-radius:var(--radius);padding:4px}
+.role-tab{flex:1;padding:7px;border:none;border-radius:8px;background:transparent;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;transition:all .15s;font-family:inherit}
+.role-tab.active{background:#fff;color:var(--blue);box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.fgroup{margin-bottom:1rem}
+.flabel{font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px}
+.finput{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:inherit;outline:none;transition:border-color .15s;background:#fff}
+.finput:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,111,219,.1)}
+select.finput{height:auto}
+.btn-main{width:100%;padding:10px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s}
+.btn-main:hover{background:var(--blue-dark)}
+/* IMPORT PANEL */
+.import-panel{background:#fff;border-radius:var(--radius-lg);box-shadow:var(--shadow);padding:1.5rem;margin-top:1rem;border:2px dashed var(--border);text-align:center;cursor:pointer;transition:all .2s}
+.import-panel:hover{border-color:var(--blue);background:var(--blue-light)}
+.import-panel input{display:none}
+.import-panel .ico{font-size:32px;margin-bottom:8px}
+.import-panel p{font-size:13px;font-weight:600;color:var(--text2)}
+.import-panel small{font-size:11px;color:var(--text3)}
+/* TOP BAR */
+#mainView{display:none;min-height:100vh;flex-direction:column}
+.topbar{background:#fff;border-bottom:1px solid var(--border);padding:8px 20px;display:flex;align-items:center;gap:12px}
+.topbar-logo{width:36px;height:36px;border-radius:8px;object-fit:cover;flex-shrink:0}
+.topbar-info{flex:1}
+.topbar-name{font-size:13px;font-weight:700;line-height:1.2}
+.topbar-addr{font-size:11px;color:var(--text2)}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.user-pill{display:flex;align-items:center;gap:8px;background:var(--bg);border-radius:20px;padding:5px 12px 5px 5px;border:1px solid var(--border)}
+.user-av{width:28px;height:28px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+.user-nm{font-size:11px;font-weight:600}
+.user-rl{font-size:10px;color:var(--text2)}
+/* NAV */
+.appnav{background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;overflow-x:auto}
+.ntab{padding:0 16px;height:46px;display:flex;align-items:center;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;border-bottom:2.5px solid transparent;transition:all .15s;white-space:nowrap}
+.ntab.active{color:var(--blue);border-bottom-color:var(--blue)}
+.ntab:hover:not(.active){color:var(--text)}
+.btn-logout{padding:6px 14px;background:transparent;color:var(--text2);border:1px solid var(--border);border-radius:var(--radius);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;margin-left:auto}
+.btn-logout:hover{color:var(--red);border-color:var(--red)}
+/* CONTENT */
+.app-content{flex:1;padding:20px;max-width:1200px;margin:0 auto;width:100%}
+.page{display:none}.page.active{display:block}
+.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:12px;flex-wrap:wrap}
+.page-title{font-size:18px;font-weight:700}
+.page-sub{font-size:12px;color:var(--text2);margin-top:3px}
+.ph-right{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+/* BUTTONS */
+.btn{padding:7px 14px;border-radius:var(--radius);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:5px}
+.btn-blue{background:var(--blue);color:#fff}.btn-blue:hover{background:var(--blue-dark)}
+.btn-green{background:var(--green);color:#fff}.btn-green:hover{background:#0a6048}
+.btn-ghost{background:#fff;color:var(--text2);border:1px solid var(--border)}.btn-ghost:hover{color:var(--text)}
+.btn-danger{background:transparent;color:var(--red);border:1px solid #f7c1c1;padding:5px 10px}.btn-danger:hover{background:var(--red-light)}
+.btn-sm{padding:5px 10px;font-size:11px}
+.btn-amber{background:var(--amber);color:#fff}.btn-amber:hover{background:#a36008}
+/* CARDS */
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:16px}
+.metric{background:#fff;border-radius:var(--radius-lg);padding:16px;border:1px solid var(--border);box-shadow:var(--shadow)}
+.metric-label{font-size:11px;color:var(--text2);font-weight:500;margin-bottom:8px}
+.metric-val{font-size:26px;font-weight:700}
+.metric-val.up{color:var(--green)}.metric-val.down{color:var(--red)}
+.card{background:#fff;border-radius:var(--radius-lg);border:1px solid var(--border);box-shadow:var(--shadow);padding:16px;margin-bottom:14px}
+.card-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.card-title{font-size:13px;font-weight:700}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:640px){.two-col{grid-template-columns:1fr}}
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{text-align:left;padding:8px 10px;font-size:10px;font-weight:700;color:var(--text2);border-bottom:1.5px solid var(--border);text-transform:uppercase;letter-spacing:.5px;background:var(--bg)}
+.tbl td{padding:8px 10px;border-bottom:1px solid var(--border)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--blue-light)}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600}
+.bg{background:var(--green-light);color:var(--green)}
+.br{background:var(--red-light);color:var(--red)}
+.bb{background:var(--blue-light);color:var(--blue)}
+.bgr{background:#f1f0f8;color:#5a5a9a}
+/* RANK */
+.rank-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--radius);background:var(--bg);margin-bottom:6px}
+.rank-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.g1{background:#fdc731;color:#5a3a00}.g2{background:#c8c8d8;color:#3a3a50}.g3{background:#e8a88a;color:#5a2810}
+.r1{background:#f7c1c1;color:var(--red)}.r2{background:#fde5b0;color:var(--amber)}.r3{background:#fde5b0;color:var(--amber)}
+.rank-name{font-size:12px;font-weight:600;flex:1}
+.rank-val{font-size:14px;font-weight:700}
+/* MISC */
+.srow{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
+.srow:last-child{border-bottom:none}
+.sname{font-size:13px;font-weight:600}
+.sinfo{font-size:11px;color:var(--text2);margin-top:2px}
+.tag{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:var(--bg);border:1px solid var(--border);border-radius:20px;font-size:12px;margin:3px}
+.tag-x{cursor:pointer;color:var(--text3)}.tag-x:hover{color:var(--red)}
+.empty{text-align:center;padding:32px;color:var(--text3);font-size:13px}
+.irow{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px}
+.irow:last-child{border-bottom:none}
+.irow strong{min-width:130px;color:var(--text2);font-weight:500}
+.wk-badge{display:inline-flex;align-items:center;gap:4px;background:var(--blue-light);color:var(--blue);padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;border:1px solid #b8d0f8}
+.chart-wrap{position:relative;width:100%}
+.h220{height:220px}.h260{height:260px}
+.tab-strip{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.t-tab{padding:5px 14px;border:1.5px solid var(--border);border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;background:#fff;color:var(--text2);transition:all .15s}
+.t-tab.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.sel-btn{padding:5px 14px;border:1.5px solid var(--border);border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;background:#fff;color:var(--text2);transition:all .15s;margin:3px}
+.sel-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(10,10,30,.45);z-index:500;display:none;align-items:center;justify-content:center;padding:1rem}
+.modal-overlay.show{display:flex}
+.modal{background:#fff;border-radius:var(--radius-lg);box-shadow:0 20px 60px rgba(0,0,0,.15);padding:1.75rem;width:100%;max-width:500px;max-height:85vh;overflow-y:auto}
+.modal-title{font-size:16px;font-weight:700;margin-bottom:1.25rem;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem;padding-top:12px;border-top:1px solid var(--border)}
+.form-section{background:var(--bg);border-radius:var(--radius);padding:12px 14px;margin-bottom:14px}
+.form-section-title{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.form-section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.edit-bar{display:flex;align-items:center;gap:8px;background:var(--amber-light);border:1px solid #f5d48a;border-radius:var(--radius);padding:8px 12px;margin-bottom:14px;font-size:12px;color:var(--amber);font-weight:600}
+.field-hint{font-size:10px;color:var(--text3);margin-top:4px;padding:4px 8px;background:var(--bg);border-radius:6px;border-left:2px solid var(--border)}
+.field-hint.info{border-left-color:var(--blue);color:var(--blue-dark);background:var(--blue-light)}
+.action-cell{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.btn-edit{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:var(--blue-light);color:var(--blue);border:1px solid #b8d0f8;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
+.btn-edit:hover{background:#d0e4fb}
+.grade-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.gw label{font-size:10px;color:var(--text2);font-weight:600;display:block;margin-bottom:3px}
+.ginput{width:100%;padding:7px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;outline:none}
+.ginput:focus{border-color:var(--blue)}
+.tbl td.ec{cursor:pointer}.tbl td.ec:hover{background:#fff8e1}
+.tbl td.ec input{width:48px;padding:2px 4px;border:1.5px solid var(--blue);border-radius:4px;font-size:11px;text-align:center;font-family:inherit;outline:none}
+/* NOTIFY */
+.notify{position:fixed;bottom:24px;right:24px;background:#1a1a2e;color:#fff;padding:12px 18px;border-radius:var(--radius-lg);font-size:13px;font-weight:500;z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s;max-width:320px}
+.notify.show{transform:translateY(0);opacity:1}
+/* UPLOAD ZONE */
+.upload-zone{border:2px dashed var(--border);border-radius:var(--radius-lg);padding:24px;text-align:center;cursor:pointer;transition:all .2s}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--blue);background:var(--blue-light)}
+.upload-zone input{display:none}
+/* FOOTER */
+.app-footer{background:#fff;border-top:1px solid var(--border);padding:12px 20px;text-align:center;font-size:11px;color:var(--text3)}
+.app-footer strong{color:var(--text2);font-weight:600}
+/* EXPORT BOX */
+.export-box{background:linear-gradient(135deg,#f0f9f4,#e6f4ef);border:1px solid #9fd8c0;border-radius:var(--radius-lg);padding:20px;margin-bottom:14px}
+.export-box h3{font-size:14px;font-weight:700;color:var(--green);margin-bottom:6px}
+.export-box p{font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.7}
+.export-actions{display:flex;gap:8px;flex-wrap:wrap}
+/* PROFILE CARD */
+.profile-card{background:linear-gradient(135deg,var(--blue),#2855c4);border-radius:var(--radius-lg);padding:20px;color:#fff;margin-bottom:14px}
+.profile-avatar{width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;margin-bottom:10px}
+.profile-name{font-size:16px;font-weight:700}
+.profile-sub{font-size:12px;opacity:.8;margin-top:3px}
+.profile-badge{display:inline-block;background:rgba(255,255,255,.2);padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;margin-top:8px;border:1px solid rgba(255,255,255,.3)}
+/* LOGO UPLOAD */
+.logo-upload-area{border:2px dashed var(--border);border-radius:var(--radius);padding:16px;text-align:center;cursor:pointer;transition:all .15s}
+.logo-upload-area:hover{border-color:var(--blue)}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginView">
+  <div class="login-wrap">
+    <div class="school-hdr">
+      <img id="loginLogo" src="https://i.imgur.com/omtDTAj.png" class="school-logo" alt="Logo">
+      <div>
+        <h2 id="loginSchoolName">SMP IIBS Ar-Rahman</h2>
+        <p id="loginSchoolAddr">Sistem Manajemen Nilai Rapot</p>
+      </div>
+    </div>
+    <div class="login-card">
+      <div class="login-title">Masuk ke Sistem</div>
+      <div class="role-tabs">
+        <button class="role-tab active" onclick="setRole('admin')">Admin</button>
+        <button class="role-tab" onclick="setRole('walikelas')">Wali Kelas</button>
+        <button class="role-tab" onclick="setRole('siswa')">Siswa</button>
+      </div>
+      <div class="fgroup"><label class="flabel">Username</label><input class="finput" id="loginUser" placeholder="Username..."/></div>
+      <div class="fgroup"><label class="flabel">Password</label><input class="finput" type="password" id="loginPass" placeholder="Password..." onkeydown="if(event.key==='Enter')doLogin()"/></div>
+      <button class="btn-main" onclick="doLogin()">Masuk</button>
+    </div>
+    <!-- Import data JSON untuk wali kelas / siswa -->
+    <div id="importPanel" style="display:none">
+      <div style="text-align:center;margin:14px 0;font-size:12px;color:var(--text3)">── atau ──</div>
+      <div class="import-panel" onclick="document.getElementById('jsonImportFile').click()">
+        <input type="file" id="jsonImportFile" accept=".json" onchange="importJSON(event)"/>
+        <div class="ico">📂</div>
+        <p>Import File Data (JSON)</p>
+        <small>Buka file data yang dikirim oleh Admin</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="mainView">
+  <!-- Topbar -->
+  <div class="topbar">
+    <img id="topbarLogo" src="https://i.imgur.com/omtDTAj.png" class="topbar-logo" alt="Logo">
+    <div class="topbar-info">
+      <div class="topbar-name" id="topbarName">SMP IIBS Ar-Rahman</div>
+      <div class="topbar-addr" id="topbarAddr">Sistem Manajemen Nilai Rapot</div>
+    </div>
+    <div class="topbar-right">
+      <div class="user-pill">
+        <div class="user-av" id="userAv">A</div>
+        <div><div class="user-nm" id="userNm">—</div><div class="user-rl" id="userRl">—</div></div>
+      </div>
+      <button class="btn-logout" onclick="doLogout()">Keluar</button>
+    </div>
+  </div>
+  <!-- Nav -->
+  <nav class="appnav" id="appNav"></nav>
+  <!-- Pages -->
+  <div class="app-content">
+
+    <!-- ██ ADMIN ██ -->
+    <div class="page" id="pageAdmin">
+      <div class="ph">
+        <div><div class="page-title">Dasbor Admin</div><div class="page-sub">Kelola data sekolah, wali kelas, siswa, dan mata pelajaran</div></div>
+      </div>
+      <!-- Export Box -->
+      <div class="export-box">
+        <h3>📤 Export & Bagikan Data</h3>
+        <p>Setelah mengisi semua data, export ke file JSON lalu kirim ke Wali Kelas dan Siswa via WhatsApp/email. Mereka cukup buka file HTML ini lalu import file JSON tersebut.</p>
+        <div class="export-actions">
+          <button class="btn btn-green" onclick="exportJSON()">⬇ Export JSON (Semua Data)</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportJSONSiswa()">⬇ Export per Siswa</button>
+        </div>
+      </div>
+      <div class="metrics" id="adminMetrics"></div>
+      <div class="two-col">
+        <div>
+          <div class="card">
+            <div class="card-hd"><div class="card-title">Profil Sekolah</div><button class="btn btn-blue btn-sm" onclick="showM('mSchool')">Edit</button></div>
+            <div id="schoolProfileView"></div>
+          </div>
+          <div class="card">
+            <div class="card-hd"><div class="card-title">Wali Kelas</div><button class="btn btn-blue btn-sm" onclick="openAddWK()">+ Tambah</button></div>
+            <div id="wkList"></div>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <div class="card-hd"><div class="card-title">Mata Pelajaran</div><button class="btn btn-blue btn-sm" onclick="showM('mMapel')">Kelola</button></div>
+            <div id="mapelList"></div>
+          </div>
+          <div class="card">
+            <div class="card-hd">
+              <div class="card-title">Daftar Siswa</div>
+              <div class="action-cell">
+                <button class="btn btn-green btn-sm" onclick="importSiswaExcel()">⬆ Import Excel</button>
+                <button class="btn btn-blue btn-sm" onclick="openAddSiswa()">+ Tambah</button>
+              </div>
+            </div>
+            <div style="overflow-x:auto"><table class="tbl" id="adminSiswaTable"></table></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ██ WALI KELAS DASHBOARD ██ -->
+    <div class="page" id="pageWKDash">
+      <div class="ph">
+        <div><div class="page-title" id="wkDashTitle">Dasbor Wali Kelas</div><div class="page-sub" id="wkDashSub"></div></div>
+      </div>
+      <div id="wkProfileCard"></div>
+      <div class="metrics" id="wkMetrics"></div>
+      <div class="two-col">
+        <div class="card"><div class="card-hd"><div class="card-title">Siswa Nilai Menurun</div></div><div id="listTurun"></div></div>
+        <div class="card"><div class="card-hd"><div class="card-title">Siswa Nilai Terbaik</div></div><div id="listTerbaik"></div></div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:14px">Rata-rata Nilai Per Semester</div>
+        <div class="chart-wrap h220"><canvas id="chartWKAvg"></canvas></div>
+      </div>
+    </div>
+
+    <!-- ██ WALI KELAS DATA SISWA ██ -->
+    <div class="page" id="pageWKSiswa">
+      <div class="ph">
+        <div><div class="page-title">Data Siswa</div><div class="page-sub" id="wkSiswaSub"></div></div>
+        <div class="ph-right">
+          <button class="btn btn-blue" onclick="openAddSiswa()">+ Tambah Siswa</button>
+          <button class="btn btn-green" onclick="exportJSONWK()">⬇ Export Data Kelas</button>
+        </div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px" id="wkStuSelector"></div>
+      <div id="wkStuDetail"></div>
+    </div>
+
+    <!-- ██ WALI KELAS UPLOAD NILAI ██ -->
+    <div class="page" id="pageWKUpload">
+      <div class="ph">
+        <div><div class="page-title">Input Nilai</div><div class="page-sub">Input manual atau import dari Excel</div></div>
+        <div class="ph-right">
+          <button class="btn btn-ghost" onclick="downloadNilaiTemplate()">⬇ Template Excel</button>
+          <button class="btn btn-green" onclick="exportJSONWK()">⬇ Export Data Kelas</button>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px">Import dari Excel</div>
+          <div class="upload-zone" onclick="document.getElementById('xlsxFile').click()">
+            <input type="file" id="xlsxFile" accept=".xlsx,.xls,.csv" onchange="handleNilaiExcel(event)"/>
+            <div style="font-size:32px;margin-bottom:8px">📊</div>
+            <div style="font-size:13px;font-weight:600;margin-bottom:4px">Klik untuk pilih file Excel</div>
+            <div style="font-size:11px;color:var(--text2)">Format sesuai template · .xlsx / .xls</div>
+          </div>
+          <div id="uploadFeedback" style="margin-top:10px;font-size:12px"></div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px">Input Manual</div>
+          <div class="fgroup"><label class="flabel">Siswa</label><select class="finput" id="manSiswa"></select></div>
+          <div class="fgroup"><label class="flabel">Mata Pelajaran</label><select class="finput" id="manMapel"></select></div>
+          <div class="flabel" style="margin-bottom:6px">Nilai per Semester</div>
+          <div class="grade-grid" id="gradeInputs"></div>
+          <button class="btn btn-blue" style="width:100%;margin-top:12px;justify-content:center" onclick="saveManual()">Simpan Nilai</button>
+        </div>
+      </div>
+      <div class="card" id="previewCard" style="display:none">
+        <div class="card-hd"><div class="card-title">Data Nilai Tersimpan <span style="font-size:11px;font-weight:400;color:var(--text2)">(klik nilai untuk edit)</span></div></div>
+        <div style="overflow-x:auto"><table class="tbl" id="previewTable"></table></div>
+      </div>
+    </div>
+
+    <!-- ██ SISWA DASHBOARD ██ -->
+    <div class="page" id="pageSiswaDash">
+      <div class="ph">
+        <div><div class="page-title" id="siswaDashTitle">Dasbor Saya</div><div class="page-sub" id="siswaDashSub"></div></div>
+      </div>
+      <div class="metrics" id="siswaMetrics"></div>
+      <div class="two-col">
+        <div class="card"><div class="card-title" style="margin-bottom:12px">3 Nilai Terbaik</div><div id="s3top"></div></div>
+        <div class="card"><div class="card-title" style="margin-bottom:12px">3 Nilai Terendah</div><div id="s3bot"></div></div>
+      </div>
+      <div class="card"><div class="card-title" style="margin-bottom:12px">Grafik Nilai per Mapel</div><div class="chart-wrap h260"><canvas id="chartSiswaAll"></canvas></div></div>
+    </div>
+
+    <!-- ██ SISWA PER SEMESTER ██ -->
+    <div class="page" id="pageSiswaSem">
+      <div class="ph"><div><div class="page-title">Analisis Per Semester</div></div></div>
+      <div class="tab-strip" id="semTabs"></div>
+      <div id="semContent"></div>
+    </div>
+
+    <!-- ██ SISWA PER MAPEL ██ -->
+    <div class="page" id="pageSiswaMapel">
+      <div class="ph"><div><div class="page-title">Analisis Per Mata Pelajaran</div></div></div>
+      <div class="tab-strip" id="mapelTabs"></div>
+      <div id="mapelContent"></div>
+    </div>
+
+  </div>
+  <footer class="app-footer">Copyright &copy; 2026 <strong>RUMAHIMI</strong> &mdash; Sistem Manajemen Nilai Rapot</footer>
+</div>
+
+<!-- MODALS -->
+<!-- Profil Sekolah -->
+<div class="modal-overlay" id="mSchool">
+  <div class="modal">
+    <div class="modal-title">Profil Sekolah</div>
+    <div class="fgroup"><label class="flabel">Nama Sekolah</label><input class="finput" id="sch_name"/></div>
+    <div class="fgroup"><label class="flabel">Alamat</label><input class="finput" id="sch_addr"/></div>
+    <div class="fgroup"><label class="flabel">Kontak</label><input class="finput" id="sch_contact"/></div>
+    <div class="fgroup">
+      <label class="flabel">Logo (URL gambar)</label>
+      <input class="finput" id="sch_logo" placeholder="https://... atau kosongkan"/>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="hideM('mSchool')">Batal</button>
+      <button class="btn btn-blue" onclick="saveSchool()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Tambah/Edit Wali Kelas -->
+<div class="modal-overlay" id="mWK">
+  <div class="modal">
+    <div class="modal-title" id="mWKTitle">Tambah Wali Kelas</div>
+    <input type="hidden" id="wk_edit_id"/>
+    <div id="mWKEditBar" class="edit-bar" style="display:none">✎ Mode Edit — ubah data wali kelas</div>
+    <div class="form-section">
+      <div class="form-section-title">Data</div>
+      <div class="fgroup"><label class="flabel">Nama Lengkap</label><input class="finput" id="wk_name" placeholder="Nama wali kelas..."/></div>
+      <div class="fgroup"><label class="flabel">Kelas yang Diampu</label><input class="finput" id="wk_kelas" placeholder="Contoh: VII-A"/></div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Akun Login</div>
+      <div class="fgroup"><label class="flabel">Username</label><input class="finput" id="wk_user" placeholder="Username login..."/><div class="field-hint info" id="wk_user_hint" style="display:none"></div></div>
+      <div class="fgroup"><label class="flabel">Password</label><input class="finput" type="password" id="wk_pass" placeholder="Password..."/><div class="field-hint" id="wk_pass_note" style="display:none">Kosongkan jika tidak ingin mengubah password</div></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="hideM('mWK')">Batal</button>
+      <button class="btn btn-blue" id="mWKSaveBtn" onclick="saveWK()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Tambah/Edit Siswa -->
+<div class="modal-overlay" id="mSiswa">
+  <div class="modal">
+    <div class="modal-title" id="mSiswaTitle">Tambah Siswa</div>
+    <input type="hidden" id="sw_edit_id"/>
+    <div id="mSiswaEditBar" class="edit-bar" style="display:none">✎ Mode Edit — ubah data siswa</div>
+    <div class="form-section">
+      <div class="form-section-title">Data Siswa</div>
+      <div class="fgroup"><label class="flabel">Nama Lengkap</label><input class="finput" id="sw_name" placeholder="Nama lengkap siswa..."/></div>
+      <div class="fgroup" id="swKelasWrap"><label class="flabel">Kelas</label><select class="finput" id="sw_kelas"></select></div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Akun Login</div>
+      <div class="fgroup"><label class="flabel">Username</label><input class="finput" id="sw_user" placeholder="Username login..."/><div class="field-hint info" id="sw_user_hint" style="display:none"></div></div>
+      <div class="fgroup"><label class="flabel">Password</label><input class="finput" type="password" id="sw_pass" placeholder="Password..."/><div class="field-hint" id="sw_pass_note" style="display:none">Kosongkan jika tidak ingin mengubah password</div></div>
+    </div>
+    <div class="fgroup" style="display:none" id="swExcelWrap">
+      <label class="flabel">Atau Import Excel</label>
+      <div class="upload-zone" onclick="document.getElementById('siswaXlsx').click()" style="padding:16px">
+        <input type="file" id="siswaXlsx" accept=".xlsx,.xls,.csv" onchange="importSiswaExcelFile(event)"/>
+        <div style="font-size:13px;font-weight:600">📋 Klik untuk pilih file Excel Siswa</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:4px">Format: Nama | Username | Password | Kelas</div>
+      </div>
+      <div id="siswaImportFeedback" style="margin-top:8px;font-size:12px"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-sm" onclick="toggleExcelImport()" id="btnToggleExcel">⬆ Import Excel</button>
+      <button class="btn btn-ghost" onclick="hideM('mSiswa')">Batal</button>
+      <button class="btn btn-blue" id="mSiswaSaveBtn" onclick="saveSiswa()">Simpan Siswa</button>
+    </div>
+  </div>
+</div>
+
+<!-- Kelola Mapel -->
+<div class="modal-overlay" id="mMapel">
+  <div class="modal">
+    <div class="modal-title">Kelola Mata Pelajaran</div>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <input class="finput" id="newMapelInput" placeholder="Nama mata pelajaran baru..." style="flex:1" onkeydown="if(event.key==='Enter')addMapel()"/>
+      <button class="btn btn-blue" onclick="addMapel()">Tambah</button>
+    </div>
+    <div id="mapelTagModal"></div>
+    <div class="modal-footer"><button class="btn btn-blue" onclick="hideM('mMapel')">Selesai</button></div>
+  </div>
+</div>
+
+<!-- Import per Siswa (export dari Export per Siswa) -->
+<div class="modal-overlay" id="mImportSiswa">
+  <div class="modal">
+    <div class="modal-title">Import Data Siswa</div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.7">Import file JSON yang dikirim Admin khusus untuk siswa/wali kelas tertentu.</p>
+    <div class="upload-zone" onclick="document.getElementById('jsonSiswaFile').click()">
+      <input type="file" id="jsonSiswaFile" accept=".json" onchange="importJSONSiswa(event)"/>
+      <div style="font-size:32px;margin-bottom:8px">📂</div>
+      <div style="font-size:13px;font-weight:600">Klik untuk pilih file JSON</div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="hideM('mImportSiswa')">Tutup</button></div>
+  </div>
+</div>
+
+<div class="notify" id="notify"></div>
+
+<script>
+// ════════════════════════════════
+//  KONSTANTA & GLOBALS
+// ════════════════════════════════
+const SEMS = ['Sem 1','Sem 2','Sem 3','Sem 4','Sem 5','Sem 6'];
+const COLORS = ['#1a6fdb','#0e7c5b','#c47a0a','#993556','#6d4abf','#0891b2','#c0392b','#5f7a5a','#2ecc71','#e74c3c','#9b59b6','#1abc9c','#f39c12','#34495e'];
+const MAPEL_DEFAULT = ['PAI','PPKN','Bahasa Indonesia','Matematika','IPA','IPS','Bahasa Inggris','PJOK','TIK','SBDP','Lab. Sains','BTAQ','Bahasa Arab','Bahasa Jawa'];
+let CU = null;
+let loginRole = 'admin';
+let charts = {};
+let activeWKStu = '';
+let activeSem = 0;
+let activeMapel = '';
+
+// ════════════════════════════════
+//  SUPABASE DB
+// ════════════════════════════════
+const SB_URL = 'https://dlazcfcugctluvckggcw.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsYXpjZmN1Z2N0bHV2Y2tnZ2N3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3MDU1MzcsImV4cCI6MjA5MTI4MTUzN30.gRPmoCyNaIWn-Xk8UiPpRmFNnZd-UIy4xJ0wTYwO-yo';
+const SB_HDR = { 'apikey': SB_KEY, 'Authorization': 'Bearer '+SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' };
+
+async function sbGet(table, id){
+  const r = await fetch(SB_URL+'/rest/v1/'+table+'?id=eq.'+encodeURIComponent(id)+'&limit=1', {headers:SB_HDR});
+  if(!r.ok) throw new Error('Supabase error '+r.status);
+  const rows = await r.json(); return rows[0]||null;
+}
+async function sbUpsert(table, row){
+  const r = await fetch(SB_URL+'/rest/v1/'+table, {method:'POST', headers:{...SB_HDR,'Prefer':'resolution=merge-duplicates,return=minimal'}, body:JSON.stringify(row)});
+  if(!r.ok){ const t=await r.text(); throw new Error('Supabase upsert error '+r.status+': '+t); }
+}
+async function sbDelete(table, id){
+  await fetch(SB_URL+'/rest/v1/'+table+'?id=eq.'+encodeURIComponent(id), {method:'DELETE', headers:SB_HDR});
+}
+async function sbGetAll(table){
+  const r = await fetch(SB_URL+'/rest/v1/'+table+'?select=*', {headers:SB_HDR});
+  if(!r.ok) throw new Error('Supabase error '+r.status);
+  return await r.json();
+}
+
+async function dbGetUser(id){ const r=await sbGet('users',id); return r||null; }
+async function dbSetUser(id,data){ await sbUpsert('users',{id,...data}); }
+async function dbDelUser(id){ await sbDelete('users',id); await sbDelete('grades',id); }
+async function dbGetGrades(id){ const r=await sbGet('grades',id); return r?.data||{}; }
+async function dbSetGrades(id,data){ await sbUpsert('grades',{id,data}); }
+async function dbGetMapel(){ const r=await sbGet('config','mapel'); return r?.data?.list||MAPEL_DEFAULT.slice(); }
+async function dbSetMapel(list){ await sbUpsert('config',{id:'mapel',data:{list}}); }
+async function dbGetSchool(){ const r=await sbGet('config','school'); return r?.data||{name:'SMP IIBS Ar-Rahman',addr:'Sistem Manajemen Nilai Rapot',contact:'',logo:'https://i.imgur.com/omtDTAj.png'}; }
+async function dbSetSchool(data){ await sbUpsert('config',{id:'school',data}); }
+async function dbGetAllUsers(){ return await sbGetAll('users'); }
+
+// ════════════════════════════════
+//  HELPERS
+// ════════════════════════════════
+function v(id){ return (document.getElementById(id)||{}).value?.trim()||''; }
+function notify(msg, type='green'){
+  const n=document.getElementById('notify');
+  n.textContent=msg;
+  n.style.background=type==='red'?'#c0392b':type==='blue'?'#1a6fdb':'#0e7c5b';
+  n.classList.add('show'); setTimeout(()=>n.classList.remove('show'),3000);
+}
+function showM(id){ document.getElementById(id).classList.add('show'); if(id==='mMapel')renderMapelTags(); if(id==='mSchool')fillSchoolForm(); }
+function hideM(id){ document.getElementById(id).classList.remove('show'); }
+function dc(k){ if(charts[k]&&charts[k].destroy){ charts[k].destroy(); delete charts[k]; } }
+function avgAktif(vals){
+  const a=vals.filter(v=>v>0);
+  return a.length ? Math.round(a.reduce((s,v)=>s+v,0)/a.length) : 0;
+}
+function trenAktif(vals){
+  const idx=vals.map((v,i)=>v>0?i:-1).filter(i=>i>=0);
+  if(idx.length<2) return null;
+  return vals[idx[idx.length-1]] >= vals[idx[idx.length-2]];
+}
+
+// ════════════════════════════════
+//  EXPORT / IMPORT JSON
+// ════════════════════════════════
+async function exportJSON(){
+  const users = await dbGetAllUsers();
+  const usersObj = {};
+  users.forEach(u=>{ const {id,...d}=u; usersObj[id]=d; });
+  const gradesObj = {};
+  for(const u of users.filter(u=>u.role==='siswa')){
+    gradesObj[u.id] = await dbGetGrades(u.id);
+  }
+  const school = await dbGetSchool();
+  const mapel = await dbGetMapel();
+  const exportData = { school, mapel, users:usersObj, grades:gradesObj };
+  const blob = new Blob([JSON.stringify(exportData,null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'data-nilai-iibs-'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();
+  notify('Data berhasil di-export ✓');
+}
+
+async function exportJSONWK(){
+  // Export hanya data kelas yang sedang login (wali kelas)
+  const db = DB();
+  const kelas = CU.kelas;
+  const allUsers = await dbGetAllUsers();
+  const siswaKelas = allUsers
+    .filter(u=>u.role==='siswa'&&u.kelas===kelas)
+    .map(u=>u.id);
+  const school = await dbGetSchool();
+  const mapel = await dbGetMapel();
+  const exportData = { school, mapel, users:{}, grades:{} };
+  const wkData = allUsers.find(u=>u.id===CU.id);
+  if(wkData){ const {id,...d}=wkData; exportData.users[id]=d; }
+  for(const id of siswaKelas){
+    const u=allUsers.find(u=>u.id===id); if(u){ const {id:uid,...d}=u; exportData.users[uid]=d; }
+    exportData.grades[id]=await dbGetGrades(id);
+  }
+  const blob = new Blob([JSON.stringify(exportData,null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'data-kelas-'+kelas.replace(/\s/g,'-')+'-'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();
+  notify('Data kelas '+kelas+' di-export ✓');
+}
+
+async function exportJSONSiswa(){
+  const allUsers = await dbGetAllUsers();
+  const siswas = allUsers.filter(u=>u.role==='siswa');
+  if(!siswas.length){ notify('Belum ada siswa','red'); return; }
+  const school = await dbGetSchool();
+  const mapel = await dbGetMapel();
+  let count=0;
+  for(const u of siswas){
+    const grades = await dbGetGrades(u.id);
+    const {id,...udata}=u;
+    const exportData = { school, mapel, users:{[id]:udata}, grades:{[id]:grades} };
+    const wk = allUsers.find(w=>w.role==='walikelas'&&w.kelas===u.kelas);
+    if(wk){ const {id:wid,...wd}=wk; exportData.users[wid]=wd; }
+    const blob = new Blob([JSON.stringify(exportData,null,2)],{type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'nilai-'+u.name.replace(/\s+/g,'-').toLowerCase()+'.json';
+    a.click(); count++;
+  }
+  notify(count+' file JSON siswa berhasil di-export ✓');
+}
+
+async function importJSON(event){
+  const file = event.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = async e => {
+    try{
+      const imported = JSON.parse(e.target.result);
+      if(!imported.users) throw new Error('Format tidak valid');
+      notify('Mengimport data...','blue');
+      if(imported.school) await dbSetSchool(imported.school);
+      if(imported.mapel) await dbSetMapel(imported.mapel);
+      if(imported.users){
+        for(const [id,u] of Object.entries(imported.users)){
+          if(id==='admin') continue;
+          await dbSetUser(id,u);
+        }
+      }
+      if(imported.grades){
+        for(const [id,g] of Object.entries(imported.grades)){
+          await dbSetGrades(id,g);
+        }
+      }
+      notify('Data berhasil diimport ✓');
+      await updateSchoolUI();
+      event.target.value='';
+      document.getElementById('loginUser').value='';
+      document.getElementById('loginPass').value='';
+    }catch(err){
+      notify('File tidak valid: '+err.message,'red');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function importJSONSiswa(event){
+  importJSON(event);
+  hideM('mImportSiswa');
+}
+
+// ════════════════════════════════
+//  SCHOOL UI
+// ════════════════════════════════
+function updateSchoolUIData(s){
+  document.getElementById('topbarName').textContent = s.name||'SMP IIBS Ar-Rahman';
+  document.getElementById('topbarAddr').textContent = s.addr||'';
+  const logo = s.logo||'https://i.imgur.com/omtDTAj.png';
+  document.getElementById('topbarLogo').src = logo;
+  document.getElementById('loginLogo').src = logo;
+  document.getElementById('loginSchoolName').textContent = s.name||'SMP IIBS Ar-Rahman';
+  document.getElementById('loginSchoolAddr').textContent = s.addr||'Sistem Manajemen Nilai Rapot';
+}
+async function updateSchoolUI(){
+  const s = await dbGetSchool();
+  updateSchoolUIData(s);
+}
+async function fillSchoolForm(){
+  const s = await dbGetSchool();
+  document.getElementById('sch_name').value = s.name||'';
+  document.getElementById('sch_addr').value = s.addr||'';
+  document.getElementById('sch_contact').value = s.contact||'';
+  document.getElementById('sch_logo').value = s.logo||'';
+}
+async function saveSchool(){
+  const data = { name:v('sch_name'), addr:v('sch_addr'), contact:v('sch_contact'), logo:v('sch_logo')||'https://i.imgur.com/omtDTAj.png' };
+  await dbSetSchool(data); await updateSchoolUI(); hideM('mSchool');
+  notify('Profil sekolah tersimpan'); await renderAdmin();
+}
+
+// ════════════════════════════════
+//  LOGIN / LOGOUT
+// ════════════════════════════════
+function setRole(r){
+  loginRole=r;
+  document.querySelectorAll('.role-tab').forEach((b,i)=>b.className='role-tab'+(['admin','walikelas','siswa'][i]===r?' active':''));
+  document.getElementById('importPanel').style.display = r==='admin'?'none':'block';
+}
+async function doLogin(){
+  const uname = v('loginUser'), pass = v('loginPass');
+  if(!uname||!pass){ notify('Isi username dan password','red'); return; }
+  const btn = document.querySelector('.btn-main');
+  btn.textContent='Memeriksa...'; btn.disabled=true;
+  try{
+    const user = await dbGetUser(uname);
+    if(!user){ notify('Username tidak ditemukan','red'); return; }
+    if(user.pass!==pass){ notify('Password salah','red'); return; }
+    if(user.role!==loginRole){
+      const rl={'admin':'Admin','walikelas':'Wali Kelas','siswa':'Siswa'};
+      notify('Akun ini adalah '+rl[user.role]+', pilih tab yang sesuai','red');
+      setRole(user.role); return;
+    }
+    CU = {id:uname,...user};
+    document.getElementById('loginView').style.display='none';
+    document.getElementById('mainView').style.display='flex';
+    document.getElementById('mainView').style.flexDirection='column';
+    document.getElementById('userAv').textContent=(user.name||uname)[0].toUpperCase();
+    document.getElementById('userNm').textContent=user.name||uname;
+    const rlMap={'admin':'Administrator','walikelas':'Wali Kelas '+(user.kelas||''),'siswa':'Siswa'+(user.kelas?' — '+user.kelas:'')};
+    document.getElementById('userRl').textContent=rlMap[user.role]||user.role;
+    setupNav();
+    if(user.role==='admin'){ showPage('pageAdmin'); await renderAdmin(); }
+    else if(user.role==='walikelas'){ showPage('pageWKDash'); await initWKDash(); }
+    else { showPage('pageSiswaDash'); await initSiswaDash(); }
+  }catch(e){ notify('Gagal konek ke server: '+e.message,'red'); }
+  finally{ btn.textContent='Masuk'; btn.disabled=false; }
+}
+function doLogout(){
+  CU=null;
+  document.getElementById('loginUser').value='';
+  document.getElementById('loginPass').value='';
+  document.getElementById('mainView').style.display='none';
+  document.getElementById('loginView').style.display='flex';
+  loginRole='admin';
+  setRole('admin');
+  Object.values(charts).forEach(c=>c&&c.destroy&&c.destroy());
+  charts={};
+}
+
+// ════════════════════════════════
+//  NAV & PAGE
+// ════════════════════════════════
+function setupNav(){
+  const tabs = CU.role==='admin'
+    ?[{id:'pageAdmin',l:'Dasbor Admin'}]
+    :CU.role==='walikelas'
+    ?[{id:'pageWKDash',l:'Dasbor'},{id:'pageWKSiswa',l:'Data Siswa'},{id:'pageWKUpload',l:'Input Nilai'}]
+    :[{id:'pageSiswaDash',l:'Dasbor'},{id:'pageSiswaSem',l:'Per Semester'},{id:'pageSiswaMapel',l:'Per Mapel'}];
+  document.getElementById('appNav').innerHTML = tabs.map(t=>`<div class="ntab" id="nt_${t.id}" onclick="navClick('${t.id}')">${t.l}</div>`).join('');
+}
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('active'));
+  const nt=document.getElementById('nt_'+id); if(nt)nt.classList.add('active');
+}
+async function navClick(id){
+  showPage(id);
+  if(id==='pageAdmin') await renderAdmin();
+  else if(id==='pageWKDash') await initWKDash();
+  else if(id==='pageWKSiswa') await initWKSiswa();
+  else if(id==='pageWKUpload'){ await populateManualForm(); await showPreview(); }
+  else if(id==='pageSiswaDash') await initSiswaDash();
+  else if(id==='pageSiswaSem') await initSiswaSem();
+  else if(id==='pageSiswaMapel') await initSiswaMapel();
+}
+
+// ════════════════════════════════
+//  ADMIN
+// ════════════════════════════════
+async function renderAdmin(){
+  const users = await dbGetAllUsers();
+  const wks = users.filter(u=>u.role==='walikelas');
+  const siswas = users.filter(u=>u.role==='siswa');
+  const mapel = await dbGetMapel();
+  const s = await dbGetSchool();
+  // Metrics
+  document.getElementById('adminMetrics').innerHTML=`
+    <div class="metric"><div class="metric-label">Wali Kelas</div><div class="metric-val">${wks.length}</div></div>
+    <div class="metric"><div class="metric-label">Total Siswa</div><div class="metric-val">${siswas.length}</div></div>
+    <div class="metric"><div class="metric-label">Mata Pelajaran</div><div class="metric-val">${mapel.length}</div></div>
+    <div class="metric"><div class="metric-label">Kelas Aktif</div><div class="metric-val">${[...new Set(wks.map(w=>w.kelas).filter(Boolean))].length}</div></div>`;
+  // School
+  document.getElementById('schoolProfileView').innerHTML=`
+    <div class="irow"><strong>Nama Sekolah</strong>${s.name||'-'}</div>
+    <div class="irow"><strong>Alamat</strong>${s.addr||'-'}</div>
+    <div class="irow"><strong>Kontak</strong>${s.contact||'-'}</div>
+    <div class="irow"><strong>Logo</strong><img src="${s.logo||''}" style="height:36px;border-radius:6px;border:1px solid var(--border)" onerror="this.style.display='none'"></div>`;
+  // WK
+  document.getElementById('wkList').innerHTML=wks.length?wks.map(w=>`
+    <div class="srow">
+      <div><div class="sname">${w.name}</div><div class="sinfo">@${w.id} · <span class="wk-badge">Kelas ${w.kelas}</span></div></div>
+      <div class="action-cell">
+        <button class="btn-edit" onclick="openEditWK('${w.id}')">Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="delUser('${w.id}')">Hapus</button>
+      </div>
+    </div>`).join(''):`<div class="empty">Belum ada wali kelas</div>`;
+  // Mapel
+  document.getElementById('mapelList').innerHTML=mapel.map((m,i)=>`<span class="tag">${m}<span class="tag-x" onclick="removeMapel(${i})">×</span></span>`).join('');
+  // Siswa
+  document.getElementById('adminSiswaTable').innerHTML=`
+    <thead><tr><th>Nama</th><th>Username</th><th>Kelas</th><th>Wali Kelas</th><th>Aksi</th></tr></thead>
+    <tbody>${siswas.map(s=>{
+      const wk=wks.find(w=>w.kelas===s.kelas);
+      return`<tr><td style="font-weight:600">${s.name}</td><td style="color:var(--text2)">@${s.id}</td><td><span class="badge bb">${s.kelas||'-'}</span></td><td>${wk?wk.name:'-'}</td>
+      <td><div class="action-cell"><button class="btn-edit" onclick="openEditSiswa('${s.id}')">Edit</button><button class="btn btn-danger btn-sm" onclick="delUser('${s.id}')">Hapus</button></div></td></tr>`;
+    }).join('')}</tbody>`;
+}
+
+async function delUser(id){
+  if(!confirm('Hapus pengguna @'+id+'?')) return;
+  await dbDelUser(id); await renderAdmin(); notify('Pengguna dihapus');
+}
+
+// ── WALI KELAS CRUD ──
+async function openAddWK(){
+  document.getElementById('mWKTitle').textContent='Tambah Wali Kelas';
+  document.getElementById('wk_edit_id').value='';
+  document.getElementById('mWKEditBar').style.display='none';
+  document.getElementById('wk_user_hint').style.display='none';
+  document.getElementById('wk_pass_note').style.display='none';
+  document.getElementById('mWKSaveBtn').textContent='Simpan Wali Kelas';
+  ['wk_name','wk_user','wk_pass','wk_kelas'].forEach(id=>{ const el=document.getElementById(id); if(el)el.value=''; });
+  showM('mWK');
+}
+async function openEditWK(id){
+  const u = await dbGetUser(id); if(!u) return;
+  document.getElementById('mWKTitle').textContent='Edit Wali Kelas';
+  document.getElementById('wk_edit_id').value=id;
+  document.getElementById('mWKEditBar').style.display='flex';
+  document.getElementById('wk_name').value=u.name||'';
+  document.getElementById('wk_user').value=id;
+  document.getElementById('wk_user_hint').textContent='Username aktif: @'+id;
+  document.getElementById('wk_user_hint').style.display='block';
+  document.getElementById('wk_pass').value='';
+  document.getElementById('wk_pass_note').style.display='block';
+  document.getElementById('wk_kelas').value=u.kelas||'';
+  document.getElementById('mWKSaveBtn').textContent='Perbarui Wali Kelas';
+  showM('mWK');
+}
+async function saveWK(){
+  const name=v('wk_name'), newUser=v('wk_user'), pass=v('wk_pass'), kelas=v('wk_kelas');
+  const editId=v('wk_edit_id');
+  if(!name||!newUser||!kelas){ notify('Nama, username, dan kelas wajib diisi','red'); return; }
+  if(editId){
+    const old=await dbGetUser(editId);
+    const finalPass=pass||old.pass;
+    if(newUser!==editId){
+      const ex=await dbGetUser(newUser); if(ex){ notify('Username sudah digunakan','red'); return; }
+      await dbSetUser(newUser,{pass:finalPass,role:'walikelas',name,kelas});
+      await dbDelUser(editId);
+    } else {
+      await dbSetUser(editId,{pass:finalPass,role:'walikelas',name,kelas});
+    }
+    notify('Wali kelas diperbarui');
+  } else {
+    if(!pass){ notify('Password wajib untuk akun baru','red'); return; }
+    if(await dbGetUser(newUser)){ notify('Username sudah digunakan','red'); return; }
+    await dbSetUser(newUser,{pass,role:'walikelas',name,kelas});
+    notify('Wali kelas ditambahkan');
+  }
+  hideM('mWK'); await renderAdmin();
+}
+
+// ── SISWA CRUD ──
+async function openAddSiswa(){
+  document.getElementById('mSiswaTitle').textContent='Tambah Siswa';
+  document.getElementById('sw_edit_id').value='';
+  document.getElementById('mSiswaEditBar').style.display='none';
+  document.getElementById('sw_user_hint').style.display='none';
+  document.getElementById('sw_pass_note').style.display='none';
+  document.getElementById('mSiswaSaveBtn').textContent='Simpan Siswa';
+  document.getElementById('btnToggleExcel').style.display='inline-flex';
+  document.getElementById('swExcelWrap').style.display='none';
+  document.getElementById('siswaImportFeedback').innerHTML='';
+  ['sw_name','sw_user','sw_pass'].forEach(id=>{ const el=document.getElementById(id); if(el)el.value=''; });
+  // Isi dropdown kelas
+  const wks = (await dbGetAllUsers()).filter(u=>u.role==='walikelas');
+  const kelasList = [...new Set(wks.map(w=>w.kelas).filter(Boolean))].sort();
+  const el=document.getElementById('sw_kelas');
+  el.innerHTML='<option value="">— pilih kelas —</option>'+kelasList.map(k=>`<option value="${k}">${k}</option>`).join('');
+  document.getElementById('swKelasWrap').style.display = CU.role==='walikelas'?'none':'block';
+  showM('mSiswa');
+}
+async function openEditSiswa(id){
+  const u=await dbGetUser(id); if(!u) return;
+  document.getElementById('mSiswaTitle').textContent='Edit Siswa';
+  document.getElementById('sw_edit_id').value=id;
+  document.getElementById('mSiswaEditBar').style.display='flex';
+  document.getElementById('sw_name').value=u.name||'';
+  document.getElementById('sw_user').value=id;
+  document.getElementById('sw_user_hint').textContent='Username aktif: @'+id;
+  document.getElementById('sw_user_hint').style.display='block';
+  document.getElementById('sw_pass').value='';
+  document.getElementById('sw_pass_note').style.display='block';
+  document.getElementById('mSiswaSaveBtn').textContent='Perbarui Siswa';
+  document.getElementById('btnToggleExcel').style.display='none';
+  document.getElementById('swExcelWrap').style.display='none';
+  const wks=(await dbGetAllUsers()).filter(u=>u.role==='walikelas');
+  const kelasList=[...new Set(wks.map(w=>w.kelas).filter(Boolean))].sort();
+  document.getElementById('sw_kelas').innerHTML=kelasList.map(k=>`<option value="${k}" ${k===u.kelas?'selected':''}>${k}</option>`).join('');
+  document.getElementById('swKelasWrap').style.display='block';
+  showM('mSiswa');
+}
+function toggleExcelImport(){
+  const wrap=document.getElementById('swExcelWrap');
+  wrap.style.display=wrap.style.display==='none'?'block':'none';
+}
+async function saveSiswa(){
+  const name=v('sw_name'), newUser=v('sw_user'), pass=v('sw_pass');
+  const kelasEl=document.getElementById('sw_kelas');
+  const kelas=CU.role==='walikelas'?CU.kelas:kelasEl.value;
+  const editId=v('sw_edit_id');
+  if(!name||!newUser||!kelas){ notify('Nama, username, dan kelas wajib diisi','red'); return; }
+  if(editId){
+    const old=await dbGetUser(editId);
+    const finalPass=pass||old.pass;
+    if(newUser!==editId){
+      if(await dbGetUser(newUser)){ notify('Username sudah digunakan','red'); return; }
+      const g=await dbGetGrades(editId);
+      await dbSetUser(newUser,{pass:finalPass,role:'siswa',name,kelas});
+      await dbSetGrades(newUser,g);
+      await dbDelUser(editId);
+    } else {
+      await dbSetUser(editId,{pass:finalPass,role:'siswa',name,kelas});
+    }
+    notify('Siswa diperbarui');
+  } else {
+    if(!pass){ notify('Password wajib untuk akun baru','red'); return; }
+    if(await dbGetUser(newUser)){ notify('Username sudah digunakan','red'); return; }
+    await dbSetUser(newUser,{pass,role:'siswa',name,kelas});
+    await dbSetGrades(newUser,{});
+    notify('Siswa ditambahkan');
+  }
+  hideM('mSiswa');
+  if(CU.role==='admin') await renderAdmin(); else await initWKSiswa();
+}
+function importSiswaExcel(){ openAddSiswa(); setTimeout(()=>document.getElementById('swExcelWrap').style.display='block',50); }
+async function importSiswaExcelFile(event){
+  const file=event.target.files[0]; if(!file) return;
+  const fb=document.getElementById('siswaImportFeedback');
+  const reader=new FileReader();
+  reader.onload=async e=>{
+    try{
+      const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});
+      const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1}).slice(1).filter(r=>r[0]);
+      const wks=(await dbGetAllUsers()).filter(u=>u.role==='walikelas');
+      const kelasDef=CU.role==='walikelas'?CU.kelas:'';
+      let added=0,skip=0;
+      for(const row of rows){
+        const name=(row[0]||'').toString().trim();
+        const uname=(row[1]||'').toString().trim().toLowerCase().replace(/\s+/g,'_');
+        const pass=(row[2]||'siswa123').toString().trim();
+        const kelas=CU.role==='walikelas'?kelasDef:((row[3]||'').toString().trim()||kelasDef);
+        if(!name||!uname){ skip++; continue; }
+        if(await dbGetUser(uname)){ skip++; continue; }
+        await dbSetUser(uname,{pass,role:'siswa',name,kelas});
+        await dbSetGrades(uname,{}); added++;
+      }
+      fb.innerHTML=`<span style="color:var(--green)">✓ ${added} siswa ditambahkan${skip?', '+skip+' dilewati':''}</span>`;
+      if(CU.role==='admin') await renderAdmin(); else await initWKSiswa();
+    }catch(err){ fb.innerHTML=`<span style="color:var(--red)">Gagal membaca file</span>`; }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// ── MAPEL ──
+async function renderMapelTags(){
+  const m=await dbGetMapel();
+  document.getElementById('mapelTagModal').innerHTML=m.map((x,i)=>`<span class="tag">${x}<span class="tag-x" onclick="removeMapel(${i})">×</span></span>`).join('');
+}
+async function addMapel(){
+  const inp=document.getElementById('newMapelInput');
+  const name=(inp.value||'').trim(); if(!name){ notify('Isi nama mapel','red'); return; }
+  const m=await dbGetMapel(); if(m.includes(name)){ notify('Mapel sudah ada','red'); return; }
+  m.push(name); await dbSetMapel(m); inp.value='';
+  await renderMapelTags(); notify('Mapel "'+name+'" ditambahkan ✓'); await renderAdmin();
+}
+async function removeMapel(i){
+  const m=await dbGetMapel(); const nama=m[i]; m.splice(i,1); await dbSetMapel(m);
+  await renderMapelTags(); notify('Mapel "'+nama+'" dihapus'); await renderAdmin();
+}
+
+// ════════════════════════════════
+//  WALI KELAS
+// ════════════════════════════════
+async function getWKStudents(){
+  return (await dbGetAllUsers()).filter(u=>u.role==='siswa'&&u.kelas===CU.kelas);
+}
+async function getSiswaAvgList(id){
+  const g=await dbGetGrades(id); const mapels=Object.keys(g);
+  if(!mapels.length) return Array(6).fill(0);
+  return SEMS.map((_,si)=>{
+    const vals=mapels.map(m=>g[m][si]||0).filter(x=>x>0);
+    return vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):0;
+  });
+}
+async function getSiswaMapelData(id){
+  const g=await dbGetGrades(id);
+  return Object.keys(g)
+    .map(m=>({mapel:m,avg:avgAktif(g[m]),vals:g[m]}))
+    .filter(d=>d.avg>0)
+    .sort((a,b)=>b.avg-a.avg);
+}
+
+async function initWKDash(){
+  document.getElementById('wkDashTitle').textContent='Dasbor — Wali Kelas '+CU.kelas;
+  document.getElementById('wkDashSub').textContent='Kelas '+CU.kelas+' · '+CU.name;
+  document.getElementById('wkProfileCard').innerHTML=`
+    <div class="profile-card">
+      <div class="profile-avatar">${CU.name[0]}</div>
+      <div class="profile-name">${CU.name}</div>
+      <div class="profile-sub">Wali Kelas <strong>${CU.kelas}</strong></div>
+      <div class="profile-badge">Kelas ${CU.kelas}</div>
+    </div>`;
+  const students=await getWKStudents();
+  if(!students.length){ document.getElementById('wkMetrics').innerHTML='<div class="metric"><div class="metric-label">Siswa</div><div class="metric-val">0</div></div>'; return; }
+  const avgsAll=await Promise.all(students.map(async s=>({...s,avgs:await getSiswaAvgList(s.id)})));
+  const dec=avgsAll.filter(s=>s.avgs[5]<s.avgs[4]&&s.avgs[4]>0);
+  const imp=avgsAll.filter(s=>s.avgs[5]>=s.avgs[4]&&s.avgs[5]>0).sort((a,b)=>b.avgs[5]-a.avgs[5]);
+  document.getElementById('wkMetrics').innerHTML=`
+    <div class="metric"><div class="metric-label">Total Siswa</div><div class="metric-val">${students.length}</div></div>
+    <div class="metric"><div class="metric-label">Nilai Menurun</div><div class="metric-val down">${dec.length}</div></div>
+    <div class="metric"><div class="metric-label">Nilai Meningkat</div><div class="metric-val up">${imp.length}</div></div>
+    <div class="metric"><div class="metric-label">Mata Pelajaran</div><div class="metric-val">${(await dbGetMapel()).length}</div></div>`;
+  document.getElementById('listTurun').innerHTML=dec.length?dec.map(s=>`<div class="srow"><div><div class="sname">${s.name}</div><div class="sinfo">Sem terakhir menurun</div></div><span style="color:var(--red);font-weight:600">▼</span></div>`).join(''):`<div class="empty">Tidak ada</div>`;
+  document.getElementById('listTerbaik').innerHTML=imp.slice(0,5).map(s=>`<div class="srow"><div><div class="sname">${s.name}</div></div><span style="color:var(--green);font-weight:600">${s.avgs.filter(v=>v>0).slice(-1)[0]||0}</span></div>`).join('');
+  dc('wkAvg');
+  setTimeout(()=>{
+    const ctx=document.getElementById('chartWKAvg'); if(!ctx) return;
+    charts.wkAvg=new Chart(ctx.getContext('2d'),{type:'line',data:{labels:SEMS,datasets:avgsAll.map((s,i)=>({label:s.name,data:s.avgs,borderColor:COLORS[i%COLORS.length],backgroundColor:COLORS[i%COLORS.length]+'22',tension:.3,borderWidth:2,pointRadius:4,fill:false}))},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:11},boxWidth:10}}},scales:{y:{min:0,max:100},x:{}}}});
+  },100);
+}
+
+async function initWKSiswa(){
+  const students=await getWKStudents();
+  document.getElementById('wkSiswaSub').textContent='Kelas '+CU.kelas+' · '+students.length+' siswa';
+  if(!activeWKStu||!students.find(s=>s.id===activeWKStu)) activeWKStu=students[0]?.id||'';
+  document.getElementById('wkStuSelector').innerHTML=students.map(s=>`
+    <button class="sel-btn ${s.id===activeWKStu?'active':''}" onclick="selectWKStu('${s.id}')">${s.name}</button>`).join('');
+  if(activeWKStu) await renderWKStuDetail(activeWKStu);
+}
+async function selectWKStu(id){ activeWKStu=id; await initWKSiswa(); }
+async function renderWKStuDetail(sid){
+  const u=await dbGetUser(sid)||{name:sid};
+  const grades=await dbGetGrades(sid);
+  const md=Object.keys(grades).map(m=>({mapel:m,avg:avgAktif(grades[m]),vals:grades[m]})).filter(d=>d.avg>0).sort((a,b)=>b.avg-a.avg);
+  const top3=md.slice(0,3), bot3=md.slice(-3).reverse();
+  document.getElementById('wkStuDetail').innerHTML=`
+    <div class="two-col">
+      <div class="card"><div class="card-title" style="margin-bottom:12px">3 Nilai Terbaik — ${u.name}</div>
+        ${top3.map((d,i)=>`<div class="rank-item"><div class="rank-num ${['g1','g2','g3'][i]}">${i+1}</div><div class="rank-name">${d.mapel}</div><div class="rank-val" style="color:var(--green)">${d.avg}</div></div>`).join('')}
+      </div>
+      <div class="card"><div class="card-title" style="margin-bottom:12px">3 Nilai Terendah — ${u.name}</div>
+        ${bot3.map((d,i)=>`<div class="rank-item"><div class="rank-num ${['r1','r2','r3'][i]}">${i+1}</div><div class="rank-name">${d.mapel}</div><div class="rank-val" style="color:var(--red)">${d.avg}</div></div>`).join('')}
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="margin-bottom:12px">Tabel Nilai Lengkap — ${u.name}</div>
+      <div style="overflow-x:auto">
+        <table class="tbl">
+          <thead><tr><th>Mapel</th>${SEMS.map(s=>`<th>${s}</th>`).join('')}<th>Rata-rata</th><th>Tren</th></tr></thead>
+          <tbody>${Object.keys(grades).map(m=>{
+            const vl=grades[m]; const avg=avgAktif(vl); if(!avg) return '';
+            const up=trenAktif(vl); const tl=up===null?'—':up?'Naik':'Turun'; const tc=up===null?'bgr':up?'bg':'br';
+            return`<tr><td style="font-weight:600">${m}</td>${vl.map(x=>`<td style="color:${x===0?'#bbb':'inherit'}">${x===0?'—':x}</td>`).join('')}<td><b>${avg}</b></td><td><span class="badge ${tc}">${tl}</span></td></tr>`;
+          }).join('')}</tbody>
+        </table>
+      </div>
+    </div>`;
+  setTimeout(()=>{
+    dc('wkDetail');
+    const ctx=document.querySelector('#wkStuDetail canvas'); if(!ctx) return;
+    charts.wkDetail=new Chart(ctx.getContext('2d'),{type:'line',data:{labels:SEMS,datasets:md.map((d,i)=>({label:d.mapel,data:d.vals,borderColor:COLORS[i%COLORS.length],tension:.3,borderWidth:1.5,pointRadius:3,fill:false}))},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:10},boxWidth:8}}},scales:{y:{min:0,max:100}}}});
+  },100);
+}
+
+// ── INPUT NILAI ──
+async function populateManualForm(){
+  const students=await getWKStudents();
+  const mapel=await dbGetMapel();
+  document.getElementById('manSiswa').innerHTML='<option value="">— pilih siswa —</option>'+students.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+  document.getElementById('manMapel').innerHTML='<option value="">— pilih mapel —</option>'+mapel.map(m=>`<option value="${m}">${m}</option>`).join('');
+  document.getElementById('gradeInputs').innerHTML=SEMS.map((_,i)=>`<div class="gw"><label>Sem ${i+1}</label><input type="number" class="ginput" id="gi${i}" min="0" max="100" placeholder="0–100"/></div>`).join('');
+}
+async function saveManual(){
+  const sid=v('manSiswa'), mapel=document.getElementById('manMapel').value;
+  if(!sid||!mapel){ notify('Pilih siswa dan mapel','red'); return; }
+  const vals=SEMS.map((_,i)=>parseInt(document.getElementById('gi'+i).value)||0);
+  const g=await dbGetGrades(sid); g[mapel]=vals; await dbSetGrades(sid,g);
+  notify('Nilai disimpan ✓'); await showPreview();
+}
+async function downloadNilaiTemplate(){
+  const students=await getWKStudents(), mapel=await dbGetMapel();
+  const rows=[['Nama Siswa','Mata Pelajaran','Sem 1','Sem 2','Sem 3','Sem 4','Sem 5','Sem 6']];
+  students.forEach(s=>mapel.forEach(m=>rows.push([s.name,m,0,0,0,0,0,0])));
+  const wb=XLSX.utils.book_new();
+  const ws=XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols']=[{wch:22},{wch:18},...Array(6).fill({wch:8})];
+  XLSX.utils.book_append_sheet(wb,ws,'Template Nilai');
+  XLSX.writeFile(wb,'template-nilai-'+CU.kelas.replace(/\s/g,'')+'.xlsx');
+}
+async function handleNilaiExcel(event){
+  const file=event.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=async e=>{
+    try{
+      const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});
+      const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1});
+      const users=await dbGetAllUsers();
+      let count=0;
+      for(const row of rows.slice(1)){
+        const name=(row[0]||'').toString().trim();
+        const mapel=(row[1]||'').toString().trim();
+        if(!name||!mapel) continue;
+        const user=users.find(u=>u.name===name&&u.role==='siswa'&&u.kelas===CU.kelas);
+        if(!user) continue;
+        const vals=[2,3,4,5,6,7].map(i=>parseInt(row[i])||0);
+        const g=await dbGetGrades(user.id); g[mapel]=vals; await dbSetGrades(user.id,g); count++;
+      }
+      document.getElementById('uploadFeedback').innerHTML=`<span style="color:var(--green)">✓ ${count} data nilai berhasil diimport</span>`;
+      notify(count+' data nilai diimport ✓'); await showPreview();
+    }catch(err){ document.getElementById('uploadFeedback').innerHTML=`<span style="color:var(--red)">Gagal membaca file</span>`; }
+  };
+  reader.readAsArrayBuffer(file);
+}
+async function showPreview(){
+  const students=await getWKStudents();
+  const rows=[];
+  for(const s of students){
+    const g=await dbGetGrades(s.id);
+    Object.keys(g).forEach(m=>rows.push({sid:s.id,sname:s.name,mapel:m,vals:[...g[m]]}));
+  }
+  if(!rows.length){ document.getElementById('previewCard').style.display='none'; return; }
+  window._previewRows=rows;
+  document.getElementById('previewCard').style.display='block';
+  document.getElementById('previewTable').innerHTML=`
+    <thead><tr><th>Nama</th><th>Mapel</th>${SEMS.map(s=>`<th>${s}</th>`).join('')}<th>Avg</th><th></th></tr></thead>
+    <tbody>${rows.map((r,ri)=>{
+      const avg=avgAktif(r.vals);
+      return`<tr><td style="font-weight:600">${r.sname}</td><td>${r.mapel}</td>
+        ${r.vals.map((val,vi)=>`<td class="ec" onclick="editCell(this,${ri},${vi})">${val||'—'}</td>`).join('')}
+        <td><b>${avg}</b></td>
+        <td><button class="btn-edit" style="font-size:10px;padding:3px 8px" onclick="saveRowEdit(${ri})">Simpan</button></td></tr>`;
+    }).join('')}</tbody>`;
+}
+function editCell(td,ri,vi){
+  if(td.querySelector('input')) return;
+  const cur=window._previewRows[ri].vals[vi]||0;
+  td.innerHTML=`<input type="number" min="0" max="100" value="${cur}" style="width:48px;padding:2px 4px;border:1.5px solid var(--blue);border-radius:4px;font-size:11px;text-align:center" onblur="commitCell(this,${ri},${vi})" onkeydown="if(event.key==='Enter')this.blur()"/>`;
+  td.querySelector('input').focus();
+}
+function commitCell(input,ri,vi){
+  const val=Math.min(100,Math.max(0,parseInt(input.value)||0));
+  window._previewRows[ri].vals[vi]=val;
+  const avg=avgAktif(window._previewRows[ri].vals);
+  const row=input.closest('tr');
+  input.closest('td').textContent=val||'—';
+  const cells=row.querySelectorAll('td');
+  cells[8].innerHTML=`<b>${avg}</b>`;
+}
+async function saveRowEdit(ri){
+  if(!window._previewRows||!window._previewRows[ri]) return;
+  const r=window._previewRows[ri];
+  const g=await dbGetGrades(r.sid); g[r.mapel]=[...r.vals]; await dbSetGrades(r.sid,g);
+  notify('Nilai '+r.sname+' — '+r.mapel+' disimpan ✓');
+}
+
+// ════════════════════════════════
+//  SISWA
+// ════════════════════════════════
+async function initSiswaDash(){
+  const sid=CU.id;
+  document.getElementById('siswaDashTitle').textContent='Dasbor — '+CU.name;
+  document.getElementById('siswaDashSub').textContent='Kelas '+CU.kelas;
+  const avgs=await getSiswaAvgList(sid);
+  const md=await getSiswaMapelData(sid);
+  const latest=avgs.filter(v=>v>0).slice(-1)[0]||0;
+  const prev=avgs.filter(v=>v>0).slice(-2)[0]||0;
+  document.getElementById('siswaMetrics').innerHTML=`
+    <div class="metric"><div class="metric-label">Rata-rata Terkini</div><div class="metric-val ${latest>=prev?'up':'down'}">${latest}</div></div>
+    <div class="metric"><div class="metric-label">Nilai Tertinggi</div><div class="metric-val up">${md.length?md[0].avg:0}</div></div>
+    <div class="metric"><div class="metric-label">Nilai Terendah</div><div class="metric-val down">${md.length?md[md.length-1].avg:0}</div></div>
+    <div class="metric"><div class="metric-label">Jumlah Mapel</div><div class="metric-val">${md.length}</div></div>`;
+  document.getElementById('s3top').innerHTML=md.slice(0,3).map((d,i)=>`<div class="rank-item"><div class="rank-num ${['g1','g2','g3'][i]}">${i+1}</div><div class="rank-name">${d.mapel}</div><div class="rank-val" style="color:var(--green)">${d.avg}</div></div>`).join('');
+  document.getElementById('s3bot').innerHTML=md.slice(-3).reverse().map((d,i)=>`<div class="rank-item"><div class="rank-num ${['r1','r2','r3'][i]}">${i+1}</div><div class="rank-name">${d.mapel}</div><div class="rank-val" style="color:var(--red)">${d.avg}</div></div>`).join('');
+  dc('siswaAll');
+  setTimeout(()=>{
+    const ctx=document.getElementById('chartSiswaAll'); if(!ctx) return;
+    charts.siswaAll=new Chart(ctx.getContext('2d'),{type:'line',data:{labels:SEMS,datasets:md.map((d,i)=>({label:d.mapel,data:d.vals,borderColor:COLORS[i%COLORS.length],tension:.3,borderWidth:1.5,pointRadius:3,fill:false}))},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:10},boxWidth:8}}},scales:{y:{min:0,max:100}}}});
+  },100);
+}
+
+async function initSiswaSem(){
+  const tabs=SEMS.map((s,i)=>`<button class="t-tab ${i===activeSem?'active':''}" onclick="showSem(${i})">${s}</button>`).join('');
+  document.getElementById('semTabs').innerHTML=tabs;
+  await showSem(activeSem);
+}
+async function showSem(si){
+  activeSem=si;
+  document.querySelectorAll('#semTabs .t-tab').forEach((t,i)=>t.className='t-tab'+(i===si?' active':''));
+  const grades=await dbGetGrades(CU.id);
+  const mapel=await dbGetMapel();
+  const semData=mapel.map(m=>({mapel:m,val:grades[m]?grades[m][si]:0})).filter(d=>d.val>0);
+  const avg=semData.length?Math.round(semData.reduce((a,b)=>a+b.val,0)/semData.length):0;
+  const sorted=[...semData].sort((a,b)=>b.val-a.val);
+  document.getElementById('semContent').innerHTML=`
+    <div class="metrics">
+      <div class="metric"><div class="metric-label">Mata Pelajaran Diisi</div><div class="metric-val">${semData.length}</div></div>
+      <div class="metric"><div class="metric-label">Rata-rata ${SEMS[si]}</div><div class="metric-val">${avg}</div></div>
+      <div class="metric"><div class="metric-label">Nilai Tertinggi</div><div class="metric-val up">${sorted[0]?.val||0}</div></div>
+      <div class="metric"><div class="metric-label">Nilai Terendah</div><div class="metric-val down">${sorted[sorted.length-1]?.val||0}</div></div>
+    </div>
+    <div class="card">
+      <table class="tbl">
+        <thead><tr><th>Mata Pelajaran</th><th>Nilai</th><th>Keterangan</th></tr></thead>
+        <tbody>${sorted.map(d=>`<tr><td style="font-weight:600">${d.mapel}</td><td><b>${d.val}</b></td><td><span class="badge ${d.val>=80?'bg':d.val>=70?'bb':'br'}">${d.val>=80?'Baik':d.val>=70?'Cukup':'Perlu Peningkatan'}</span></td></tr>`).join('')}</tbody>
+      </table>
+    </div>`;
+}
+
+async function initSiswaMapel(){
+  const grades=await dbGetGrades(CU.id);
+  const md=await getSiswaMapelData(CU.id);
+  if(!activeMapel||!md.find(d=>d.mapel===activeMapel)) activeMapel=md[0]?.mapel||'';
+  document.getElementById('mapelTabs').innerHTML=md.map(d=>`<button class="t-tab ${d.mapel===activeMapel?'active':''}" onclick="showMapel('${d.mapel}')">${d.mapel}</button>`).join('');
+  if(activeMapel) await showMapel(activeMapel);
+}
+async function showMapel(mapel){
+  activeMapel=mapel;
+  document.querySelectorAll('#mapelTabs .t-tab').forEach(t=>t.className='t-tab'+(t.textContent===mapel?' active':''));
+  const grades=await dbGetGrades(CU.id);
+  const vals=grades[mapel]||Array(6).fill(0);
+  const avg=avgAktif(vals);
+  const aktif=vals.filter(v=>v>0);
+  const max=aktif.length?Math.max(...aktif):0;
+  const min=aktif.length?Math.min(...aktif):0;
+  const up=trenAktif(vals);
+  document.getElementById('mapelContent').innerHTML=`
+    <div class="metrics">
+      <div class="metric"><div class="metric-label">Rata-rata</div><div class="metric-val">${avg}</div></div>
+      <div class="metric"><div class="metric-label">Tertinggi</div><div class="metric-val up">${max}</div></div>
+      <div class="metric"><div class="metric-label">Terendah</div><div class="metric-val down">${min}</div></div>
+      <div class="metric"><div class="metric-label">Tren</div><div class="metric-val ${up===null?'':up?'up':'down'}">${up===null?'—':up?'↑ Naik':'↓ Turun'}</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="margin-bottom:12px">Grafik Nilai — ${mapel}</div>
+      <div class="chart-wrap h220"><canvas id="chartMapel"></canvas></div>
+    </div>
+    <div class="card">
+      <table class="tbl">
+        <thead><tr>${SEMS.map(s=>`<th>${s}</th>`).join('')}</tr></thead>
+        <tbody><tr>${vals.map(v=>`<td style="font-weight:600;color:${v===0?'#bbb':v>=80?'var(--green)':v>=70?'var(--blue)':'var(--red)'}">${v||'—'}</td>`).join('')}</tr></tbody>
+      </table>
+    </div>`;
+  setTimeout(()=>{
+    dc('mapelC');
+    const ctx=document.getElementById('chartMapel'); if(!ctx) return;
+    charts.mapelC=new Chart(ctx.getContext('2d'),{type:'line',data:{labels:SEMS,datasets:[{label:mapel,data:vals.map(v=>v||null),borderColor:'#1a6fdb',backgroundColor:'rgba(26,111,219,.1)',tension:.4,borderWidth:2.5,pointRadius:5,pointBackgroundColor:vals.map(v=>v>=80?'#0e7c5b':v>=70?'#1a6fdb':'#c0392b'),fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:0,max:100}}}});
+  },100);
+}
+
+// ════════════════════════════════
+//  BOOT
+// ════════════════════════════════
+async function boot(){
+  document.getElementById('loginView').style.opacity='0.5';
+  try{
+    // Test koneksi Supabase dengan timeout 6 detik
+    const ctrl = new AbortController();
+    const timer = setTimeout(()=>ctrl.abort(), 6000);
+    const r = await fetch(SB_URL+'/rest/v1/config?id=eq.school&limit=1',
+      {headers:SB_HDR, signal:ctrl.signal});
+    clearTimeout(timer);
+    if(r.ok){
+      const rows = await r.json();
+      if(rows[0]?.data) updateSchoolUIData(rows[0].data);
+    }
+  }catch(e){
+    console.warn('Boot: koneksi Supabase gagal, coba lagi saat login -', e.message);
+  }
+  document.getElementById('loginView').style.opacity='1';
+}
+boot();
+</script>
+</body>
+</html>
