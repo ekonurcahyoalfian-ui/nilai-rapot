@@ -7,6 +7,7 @@
 <link rel="icon" type="image/png" href="https://i.imgur.com/omtDTAj.png">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -29,9 +30,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .school-hdr p{font-size:12px;color:var(--text2);margin-top:2px}
 .login-card{background:#fff;border-radius:var(--radius-lg);box-shadow:var(--shadow);padding:2rem}
 .login-title{font-size:15px;font-weight:700;margin-bottom:1.25rem;text-align:center}
-.role-tabs{display:flex;gap:6px;margin-bottom:1.25rem;background:var(--bg);border-radius:var(--radius);padding:4px}
-.role-tab{flex:1;padding:7px;border:none;border-radius:8px;background:transparent;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;transition:all .15s;font-family:inherit}
-.role-tab.active{background:#fff;color:var(--blue);box-shadow:0 1px 4px rgba(0,0,0,.1)}
 .fgroup{margin-bottom:1rem}
 .flabel{font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px}
 .finput{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:inherit;outline:none;transition:border-color .15s;background:#fff}
@@ -40,7 +38,6 @@ select.finput{height:auto}
 .btn-main{width:100%;padding:10px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s}
 .btn-main:hover{background:var(--blue-dark)}
 /* IMPORT PANEL */
-.import-panel{background:#fff;border-radius:var(--radius-lg);box-shadow:var(--shadow);padding:1.5rem;margin-top:1rem;border:2px dashed var(--border);text-align:center;cursor:pointer;transition:all .2s}
 .import-panel:hover{border-color:var(--blue);background:var(--blue-light)}
 .import-panel input{display:none}
 .import-panel .ico{font-size:32px;margin-bottom:8px}
@@ -77,6 +74,7 @@ select.finput{height:auto}
 .btn-blue{background:var(--blue);color:#fff}.btn-blue:hover{background:var(--blue-dark)}
 .btn-green{background:var(--green);color:#fff}.btn-green:hover{background:#0a6048}
 .btn-ghost{background:#fff;color:var(--text2);border:1px solid var(--border)}.btn-ghost:hover{color:var(--text)}
+.btn-teal{background:#0891b2;color:#fff}.btn-teal:hover{background:#0770a0}
 .btn-danger{background:transparent;color:var(--red);border:1px solid #f7c1c1;padding:5px 10px}.btn-danger:hover{background:var(--red-light)}
 .btn-sm{padding:5px 10px;font-size:11px}
 .btn-amber{background:var(--amber);color:#fff}.btn-amber:hover{background:#a36008}
@@ -189,26 +187,13 @@ select.finput{height:auto}
     </div>
     <div class="login-card">
       <div class="login-title">Masuk ke Sistem</div>
-      <div class="role-tabs">
-        <button class="role-tab active" onclick="setRole('admin')">Admin</button>
-        <button class="role-tab" onclick="setRole('walikelas')">Wali Kelas</button>
-        <button class="role-tab" onclick="setRole('siswa')">Siswa</button>
-      </div>
       <div class="fgroup"><label class="flabel">Username</label><input class="finput" id="loginUser" placeholder="Username..."/></div>
       <div class="fgroup"><label class="flabel">Password</label><input class="finput" type="password" id="loginPass" placeholder="Password..." onkeydown="if(event.key==='Enter')doLogin()"/></div>
-      <button class="btn-main" onclick="doLogin()">Masuk</button>
+      <button class="btn-main" id="btnLogin" onclick="doLogin()">Masuk</button>
     </div>
-    <!-- Import data JSON untuk wali kelas / siswa -->
-    <div id="importPanel" style="display:none">
-      <div style="text-align:center;margin:14px 0;font-size:12px;color:var(--text3)">── atau ──</div>
-      <div class="import-panel" onclick="document.getElementById('jsonImportFile').click()">
-        <input type="file" id="jsonImportFile" accept=".json" onchange="importJSON(event)"/>
-        <div class="ico">📂</div>
-        <p>Import File Data (JSON)</p>
-        <small>Buka file data yang dikirim oleh Admin</small>
       </div>
-    </div>
-  </div>
+</div>
+
 </div>
 
 <!-- MAIN APP -->
@@ -238,15 +223,7 @@ select.finput{height:auto}
       <div class="ph">
         <div><div class="page-title">Dasbor Admin</div><div class="page-sub">Kelola data sekolah, wali kelas, siswa, dan mata pelajaran</div></div>
       </div>
-      <!-- Export Box -->
-      <div class="export-box">
-        <h3>📤 Export & Bagikan Data</h3>
-        <p>Setelah mengisi semua data, export ke file JSON lalu kirim ke Wali Kelas dan Siswa via WhatsApp/email. Mereka cukup buka file HTML ini lalu import file JSON tersebut.</p>
-        <div class="export-actions">
-          <button class="btn btn-green" onclick="exportJSON()">⬇ Export JSON (Semua Data)</button>
-          <button class="btn btn-ghost btn-sm" onclick="exportJSONSiswa()">⬇ Export per Siswa</button>
-        </div>
-      </div>
+
       <div class="metrics" id="adminMetrics"></div>
       <div class="two-col">
         <div>
@@ -282,6 +259,7 @@ select.finput{height:auto}
     <div class="page" id="pageWKDash">
       <div class="ph">
         <div><div class="page-title" id="wkDashTitle">Dasbor Wali Kelas</div><div class="page-sub" id="wkDashSub"></div></div>
+        <div class="ph-right"><button class="btn btn-teal btn-sm" onclick="exportPDF('wk-dash')">⬇ PDF Dasbor</button></div>
       </div>
       <div id="wkProfileCard"></div>
       <div class="metrics" id="wkMetrics"></div>
@@ -301,7 +279,7 @@ select.finput{height:auto}
         <div><div class="page-title">Data Siswa</div><div class="page-sub" id="wkSiswaSub"></div></div>
         <div class="ph-right">
           <button class="btn btn-blue" onclick="openAddSiswa()">+ Tambah Siswa</button>
-          <button class="btn btn-green" onclick="exportJSONWK()">⬇ Export Data Kelas</button>
+          <button class="btn btn-teal btn-sm" onclick="exportPDF('wk-siswa')">⬇ PDF Siswa</button>
         </div>
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px" id="wkStuSelector"></div>
@@ -314,7 +292,7 @@ select.finput{height:auto}
         <div><div class="page-title">Input Nilai</div><div class="page-sub">Input manual atau import dari Excel</div></div>
         <div class="ph-right">
           <button class="btn btn-ghost" onclick="downloadNilaiTemplate()">⬇ Template Excel</button>
-          <button class="btn btn-green" onclick="exportJSONWK()">⬇ Export Data Kelas</button>
+          <button class="btn btn-teal btn-sm" onclick="exportPDF('wk-upload')">⬇ PDF Nilai</button>
         </div>
       </div>
       <div class="two-col">
@@ -347,6 +325,7 @@ select.finput{height:auto}
     <div class="page" id="pageSiswaDash">
       <div class="ph">
         <div><div class="page-title" id="siswaDashTitle">Dasbor Saya</div><div class="page-sub" id="siswaDashSub"></div></div>
+        <div class="ph-right"><button class="btn btn-teal btn-sm" onclick="exportPDF('siswa-dash')">⬇ PDF Dasbor</button></div>
       </div>
       <div class="metrics" id="siswaMetrics"></div>
       <div class="two-col">
@@ -358,14 +337,14 @@ select.finput{height:auto}
 
     <!-- ██ SISWA PER SEMESTER ██ -->
     <div class="page" id="pageSiswaSem">
-      <div class="ph"><div><div class="page-title">Analisis Per Semester</div></div></div>
+      <div class="ph"><div><div class="page-title">Analisis Per Semester</div></div><div class="ph-right"><button class="btn btn-teal btn-sm" onclick="exportPDF('siswa-sem')">⬇ PDF Semester</button></div></div>
       <div class="tab-strip" id="semTabs"></div>
       <div id="semContent"></div>
     </div>
 
     <!-- ██ SISWA PER MAPEL ██ -->
     <div class="page" id="pageSiswaMapel">
-      <div class="ph"><div><div class="page-title">Analisis Per Mata Pelajaran</div></div></div>
+      <div class="ph"><div><div class="page-title">Analisis Per Mata Pelajaran</div></div><div class="ph-right"><button class="btn btn-teal btn-sm" onclick="exportPDF('siswa-mapel')">⬇ PDF Mapel</button></div></div>
       <div class="tab-strip" id="mapelTabs"></div>
       <div id="mapelContent"></div>
     </div>
@@ -486,7 +465,6 @@ const SEMS = ['Sem 1','Sem 2','Sem 3','Sem 4','Sem 5','Sem 6'];
 const COLORS = ['#1a6fdb','#0e7c5b','#c47a0a','#993556','#6d4abf','#0891b2','#c0392b','#5f7a5a','#2ecc71','#e74c3c','#9b59b6','#1abc9c','#f39c12','#34495e'];
 const MAPEL_DEFAULT = ['PAI','PPKN','Bahasa Indonesia','Matematika','IPA','IPS','Bahasa Inggris','PJOK','TIK','SBDP','Lab. Sains','BTAQ','Bahasa Arab','Bahasa Jawa'];
 let CU = null;
-let loginRole = 'admin';
 let charts = {};
 let activeWKStu = '';
 let activeSem = 0;
@@ -552,113 +530,6 @@ function trenAktif(vals){
 }
 
 // ════════════════════════════════
-//  EXPORT / IMPORT JSON
-// ════════════════════════════════
-async function exportJSON(){
-  const users = await dbGetAllUsers();
-  const usersObj = {};
-  users.forEach(u=>{ const {id,...d}=u; usersObj[id]=d; });
-  const gradesObj = {};
-  for(const u of users.filter(u=>u.role==='siswa')){
-    gradesObj[u.id] = await dbGetGrades(u.id);
-  }
-  const school = await dbGetSchool();
-  const mapel = await dbGetMapel();
-  const exportData = { school, mapel, users:usersObj, grades:gradesObj };
-  const blob = new Blob([JSON.stringify(exportData,null,2)],{type:'application/json'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'data-nilai-iibs-'+new Date().toISOString().slice(0,10)+'.json';
-  a.click();
-  notify('Data berhasil di-export ✓');
-}
-
-async function exportJSONWK(){
-  // Export hanya data kelas yang sedang login (wali kelas)
-  const db = DB();
-  const kelas = CU.kelas;
-  const allUsers = await dbGetAllUsers();
-  const siswaKelas = allUsers
-    .filter(u=>u.role==='siswa'&&u.kelas===kelas)
-    .map(u=>u.id);
-  const school = await dbGetSchool();
-  const mapel = await dbGetMapel();
-  const exportData = { school, mapel, users:{}, grades:{} };
-  const wkData = allUsers.find(u=>u.id===CU.id);
-  if(wkData){ const {id,...d}=wkData; exportData.users[id]=d; }
-  for(const id of siswaKelas){
-    const u=allUsers.find(u=>u.id===id); if(u){ const {id:uid,...d}=u; exportData.users[uid]=d; }
-    exportData.grades[id]=await dbGetGrades(id);
-  }
-  const blob = new Blob([JSON.stringify(exportData,null,2)],{type:'application/json'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'data-kelas-'+kelas.replace(/\s/g,'-')+'-'+new Date().toISOString().slice(0,10)+'.json';
-  a.click();
-  notify('Data kelas '+kelas+' di-export ✓');
-}
-
-async function exportJSONSiswa(){
-  const allUsers = await dbGetAllUsers();
-  const siswas = allUsers.filter(u=>u.role==='siswa');
-  if(!siswas.length){ notify('Belum ada siswa','red'); return; }
-  const school = await dbGetSchool();
-  const mapel = await dbGetMapel();
-  let count=0;
-  for(const u of siswas){
-    const grades = await dbGetGrades(u.id);
-    const {id,...udata}=u;
-    const exportData = { school, mapel, users:{[id]:udata}, grades:{[id]:grades} };
-    const wk = allUsers.find(w=>w.role==='walikelas'&&w.kelas===u.kelas);
-    if(wk){ const {id:wid,...wd}=wk; exportData.users[wid]=wd; }
-    const blob = new Blob([JSON.stringify(exportData,null,2)],{type:'application/json'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'nilai-'+u.name.replace(/\s+/g,'-').toLowerCase()+'.json';
-    a.click(); count++;
-  }
-  notify(count+' file JSON siswa berhasil di-export ✓');
-}
-
-async function importJSON(event){
-  const file = event.target.files[0]; if(!file) return;
-  const reader = new FileReader();
-  reader.onload = async e => {
-    try{
-      const imported = JSON.parse(e.target.result);
-      if(!imported.users) throw new Error('Format tidak valid');
-      notify('Mengimport data...','blue');
-      if(imported.school) await dbSetSchool(imported.school);
-      if(imported.mapel) await dbSetMapel(imported.mapel);
-      if(imported.users){
-        for(const [id,u] of Object.entries(imported.users)){
-          if(id==='admin') continue;
-          await dbSetUser(id,u);
-        }
-      }
-      if(imported.grades){
-        for(const [id,g] of Object.entries(imported.grades)){
-          await dbSetGrades(id,g);
-        }
-      }
-      notify('Data berhasil diimport ✓');
-      await updateSchoolUI();
-      event.target.value='';
-      document.getElementById('loginUser').value='';
-      document.getElementById('loginPass').value='';
-    }catch(err){
-      notify('File tidak valid: '+err.message,'red');
-    }
-  };
-  reader.readAsText(file);
-}
-
-function importJSONSiswa(event){
-  importJSON(event);
-  hideM('mImportSiswa');
-}
-
-// ════════════════════════════════
 //  SCHOOL UI
 // ════════════════════════════════
 function updateSchoolUIData(s){
@@ -690,25 +561,16 @@ async function saveSchool(){
 // ════════════════════════════════
 //  LOGIN / LOGOUT
 // ════════════════════════════════
-function setRole(r){
-  loginRole=r;
-  document.querySelectorAll('.role-tab').forEach((b,i)=>b.className='role-tab'+(['admin','walikelas','siswa'][i]===r?' active':''));
-  document.getElementById('importPanel').style.display = r==='admin'?'none':'block';
-}
+// setRole removed - single login box
 async function doLogin(){
   const uname = v('loginUser'), pass = v('loginPass');
   if(!uname||!pass){ notify('Isi username dan password','red'); return; }
-  const btn = document.querySelector('.btn-main');
+  const btn = document.getElementById('btnLogin');
   btn.textContent='Memeriksa...'; btn.disabled=true;
   try{
     const user = await dbGetUser(uname);
     if(!user){ notify('Username tidak ditemukan','red'); return; }
     if(user.pass!==pass){ notify('Password salah','red'); return; }
-    if(user.role!==loginRole){
-      const rl={'admin':'Admin','walikelas':'Wali Kelas','siswa':'Siswa'};
-      notify('Akun ini adalah '+rl[user.role]+', pilih tab yang sesuai','red');
-      setRole(user.role); return;
-    }
     CU = {id:uname,...user};
     document.getElementById('loginView').style.display='none';
     document.getElementById('mainView').style.display='flex';
@@ -720,8 +582,8 @@ async function doLogin(){
     setupNav();
     if(user.role==='admin'){ showPage('pageAdmin'); await renderAdmin(); }
     else if(user.role==='walikelas'){ showPage('pageWKDash'); await initWKDash(); }
-    else { showPage('pageSiswaDash'); await initSiswaDash(); }
-  }catch(e){ notify('Gagal konek ke server: '+e.message,'red'); }
+    else{ showPage('pageSiswaDash'); await initSiswaDash(); }
+  }catch(e){ notify('Gagal konek: '+e.message,'red'); }
   finally{ btn.textContent='Masuk'; btn.disabled=false; }
 }
 function doLogout(){
@@ -1257,6 +1119,268 @@ async function showMapel(mapel){
     const ctx=document.getElementById('chartMapel'); if(!ctx) return;
     charts.mapelC=new Chart(ctx.getContext('2d'),{type:'line',data:{labels:SEMS,datasets:[{label:mapel,data:vals.map(v=>v||null),borderColor:'#1a6fdb',backgroundColor:'rgba(26,111,219,.1)',tension:.4,borderWidth:2.5,pointRadius:5,pointBackgroundColor:vals.map(v=>v>=80?'#0e7c5b':v>=70?'#1a6fdb':'#c0392b'),fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:0,max:100}}}});
   },100);
+}
+
+
+// ════════════════════════════════
+//  PDF EXPORT
+// ════════════════════════════════
+const SEMS_LABEL = ['Sem 1','Sem 2','Sem 3','Sem 4','Sem 5','Sem 6'];
+
+function renderChartToImage(type, data, options, w=500, h=200){
+  return new Promise(resolve=>{
+    const canvas=document.createElement('canvas');
+    canvas.width=w; canvas.height=h;
+    const chart=new Chart(canvas.getContext('2d'),{type,data,options:{...options,animation:false,responsive:false}});
+    setTimeout(()=>{ resolve(canvas.toDataURL('image/png')); chart.destroy(); },300);
+  });
+}
+
+async function exportPDF(pdfType){
+  const {jsPDF} = window.jspdf;
+  const doc = new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const W=210, M=14, CW=W-M*2;
+  let y=10;
+  const school = await dbGetSchool();
+
+  function pdfHeader(subtitle){
+    doc.setFillColor(26,111,219);
+    doc.rect(0,0,W,22,'F');
+    doc.setTextColor(255,255,255);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(13);
+    doc.text(school.name||'SMP IIBS Ar-Rahman', M, 10);
+    doc.setFontSize(9); doc.setFont('helvetica','normal');
+    doc.text(subtitle, M, 16);
+    doc.text('Dicetak: '+new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'}), W-M, 16, {align:'right'});
+    // Copyright footer
+    doc.setFontSize(7); doc.setTextColor(150,150,150);
+    doc.text('Copyright © 2026 RUMAHIMI — Sistem Manajemen Nilai Rapot', W/2, 290, {align:'center'});
+    doc.setTextColor(30,30,30);
+    y=28;
+  }
+
+  function chk(n){ if(y+n>278){ doc.addPage(); pdfBg(); y=10; } }
+  function pdfBg(){ doc.setFontSize(7); doc.setTextColor(150,150,150); doc.text('Copyright © 2026 RUMAHIMI — Sistem Manajemen Nilai Rapot', W/2, 290, {align:'center'}); doc.setTextColor(30,30,30); }
+
+  function sectionHead(txt){
+    chk(8);
+    doc.setFillColor(232,240,253);
+    doc.rect(M,y,CW,7,'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(26,111,219);
+    doc.text(txt, M+3, y+5);
+    doc.setTextColor(30,30,30); doc.setFont('helvetica','normal');
+    y+=9;
+  }
+
+  function metricRow(items){
+    chk(14);
+    const bw=CW/items.length;
+    items.forEach((it,i)=>{
+      const x=M+i*bw;
+      doc.setFillColor(244,245,249);
+      doc.roundedRect(x+1,y,bw-2,12,2,2,'F');
+      doc.setFontSize(7); doc.setTextColor(90,90,120);
+      doc.text(it.label, x+3, y+4.5);
+      doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(26,30,46);
+      doc.text(String(it.val), x+3, y+10);
+      doc.setFont('helvetica','normal');
+    });
+    y+=15;
+  }
+
+  function tblHeader(cols, widths){
+    chk(8);
+    doc.setFillColor(232,240,253);
+    doc.rect(M,y,CW,7,'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor(26,111,219);
+    let x=M;
+    cols.forEach((c,i)=>{ doc.text(c,x+2,y+5); x+=widths[i]; });
+    doc.setFont('helvetica','normal'); doc.setTextColor(30,30,30);
+    y+=8;
+  }
+
+  function tblRow(cells, widths, ri){
+    chk(7);
+    if(ri%2===0){ doc.setFillColor(249,250,252); doc.rect(M,y,CW,6.5,'F'); }
+    doc.setFontSize(7.5);
+    let x=M;
+    cells.forEach((c,i)=>{
+      doc.setFont('helvetica', i===0?'bold':'normal');
+      doc.text(String(c??''),x+2,y+4.5,{maxWidth:widths[i]-3});
+      x+=widths[i];
+    });
+    y+=7;
+  }
+
+  // ── WALI KELAS DASBOR ──
+  if(pdfType==='wk-dash'){
+    pdfHeader('Dasbor Wali Kelas — Kelas '+CU.kelas+' — '+CU.name);
+    const students = await getWKStudents();
+    const avgsAll = await Promise.all(students.map(async s=>({...s,avgs:await getSiswaAvgList(s.id)})));
+    sectionHead('Ringkasan Kelas '+CU.kelas);
+    metricRow([
+      {label:'Total Siswa', val:students.length},
+      {label:'Nilai Meningkat', val:avgsAll.filter(s=>{const a=s.avgs.filter(v=>v>0);return a.length>=2&&a[a.length-1]>=a[a.length-2]}).length},
+      {label:'Nilai Menurun', val:avgsAll.filter(s=>{const a=s.avgs.filter(v=>v>0);return a.length>=2&&a[a.length-1]<a[a.length-2]}).length},
+      {label:'Mapel', val:(await dbGetMapel()).length}
+    ]);
+    // Grafik rata-rata kelas
+    const chartImg = await renderChartToImage('line',{
+      labels:SEMS_LABEL,
+      datasets:avgsAll.map((s,i)=>({label:s.name,data:s.avgs,borderColor:['#1a6fdb','#0e7c5b','#c47a0a','#993556','#6d4abf','#0891b2'][i%6],tension:.3,borderWidth:2,pointRadius:3,fill:false}))
+    },{plugins:{legend:{labels:{font:{size:8},boxWidth:8}}},scales:{y:{min:0,max:100,ticks:{font:{size:7}}},x:{ticks:{font:{size:7}}}}},660,200);
+    chk(55);
+    sectionHead('Grafik Rata-rata Nilai Per Semester');
+    doc.addImage(chartImg,'PNG',M,y,CW,50); y+=54;
+    // Tabel siswa
+    sectionHead('Daftar Nilai Siswa');
+    tblHeader(['Nama Siswa','Sem 1','Sem 2','Sem 3','Sem 4','Sem 5','Sem 6','Rata-rata'],[55,18,18,18,18,18,18,27]);
+    avgsAll.sort((a,b)=>{const aa=avgAktif(a.avgs),ba=avgAktif(b.avgs);return ba-aa;}).forEach((s,ri)=>{
+      tblRow([s.name,...s.avgs.map(v=>v||'—'),avgAktif(s.avgs)],[55,18,18,18,18,18,18,27],ri);
+    });
+    doc.save('dasbor-kelas-'+CU.kelas.replace(/\s/g,'')+'.pdf');
+  }
+
+  // ── WALI KELAS DATA SISWA ──
+  else if(pdfType==='wk-siswa'){
+    pdfHeader('Data Nilai Siswa — Kelas '+CU.kelas);
+    const students = await getWKStudents();
+    for(const s of students){
+      const grades = await dbGetGrades(s.id);
+      const md = Object.keys(grades).map(m=>({mapel:m,avg:avgAktif(grades[m]),vals:grades[m]})).filter(d=>d.avg>0).sort((a,b)=>b.avg-a.avg);
+      if(!md.length) continue;
+      chk(12);
+      sectionHead(s.name+' — Rata-rata: '+avgAktif(md.map(d=>d.avg)));
+      tblHeader(['Mata Pelajaran','Sem 1','Sem 2','Sem 3','Sem 4','Sem 5','Sem 6','Avg','Tren'],[45,16,16,16,16,16,16,18,21]);
+      md.forEach((d,ri)=>{
+        const up=trenAktif(d.vals); const tl=up===null?'—':up?'Naik':'Turun';
+        tblRow([d.mapel,...d.vals.map(v=>v||'—'),d.avg,tl],[45,16,16,16,16,16,16,18,21],ri);
+      });
+      y+=4;
+    }
+    doc.save('nilai-siswa-kelas-'+CU.kelas.replace(/\s/g,'')+'.pdf');
+  }
+
+  // ── WALI KELAS NILAI (upload page) ──
+  else if(pdfType==='wk-upload'){
+    pdfHeader('Rekap Nilai — Kelas '+CU.kelas);
+    const students = await getWKStudents();
+    const mapel = await dbGetMapel();
+    // Tabel besar semua siswa x mapel
+    tblHeader(['Nama','Mata Pelajaran','S1','S2','S3','S4','S5','S6','Avg'],[38,40,13,13,13,13,13,13,16]);
+    let ri=0;
+    for(const s of students){
+      const grades = await dbGetGrades(s.id);
+      for(const m of mapel){
+        if(!grades[m]) continue;
+        const avg=avgAktif(grades[m]);
+        if(!avg) continue;
+        tblRow([s.name,m,...grades[m].map(v=>v||'—'),avg],[38,40,13,13,13,13,13,13,16],ri++);
+      }
+    }
+    doc.save('rekap-nilai-'+CU.kelas.replace(/\s/g,'')+'.pdf');
+  }
+
+  // ── SISWA DASBOR ──
+  else if(pdfType==='siswa-dash'){
+    pdfHeader('Rapot Digital — '+CU.name+' — Kelas '+CU.kelas);
+    const avgs = await getSiswaAvgList(CU.id);
+    const md = await getSiswaMapelData(CU.id);
+    const latest = avgs.filter(v=>v>0).slice(-1)[0]||0;
+    sectionHead('Ringkasan Nilai');
+    metricRow([
+      {label:'Rata-rata Terkini', val:latest},
+      {label:'Nilai Tertinggi', val:md.length?md[0].avg:0},
+      {label:'Nilai Terendah', val:md.length?md[md.length-1].avg:0},
+      {label:'Jumlah Mapel', val:md.length}
+    ]);
+    // 3 terbaik & terendah
+    const top3=md.slice(0,3), bot3=md.slice(-3).reverse();
+    chk(30);
+    const xL=M, xR=M+CW/2+2;
+    doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(14,124,91);
+    doc.text('3 Nilai Terbaik',xL,y); doc.setTextColor(192,57,43); doc.text('3 Nilai Terendah',xR,y); y+=4;
+    doc.setFont('helvetica','normal'); doc.setTextColor(30,30,30);
+    for(let i=0;i<3;i++){
+      if(top3[i]){ doc.setFontSize(8); doc.text((i+1)+'. '+top3[i].mapel+' ('+top3[i].avg+')',xL,y); }
+      if(bot3[i]){ doc.setFontSize(8); doc.text((i+1)+'. '+bot3[i].mapel+' ('+bot3[i].avg+')',xR,y); }
+      y+=5;
+    }
+    y+=4;
+    // Grafik semua mapel
+    if(md.length){
+      const chartImg = await renderChartToImage('line',{
+        labels:SEMS_LABEL,
+        datasets:md.map((d,i)=>({label:d.mapel,data:d.vals,borderColor:['#1a6fdb','#0e7c5b','#c47a0a','#993556','#6d4abf','#0891b2','#c0392b','#5f7a5a','#2ecc71','#e74c3c','#9b59b6','#1abc9c','#f39c12','#34495e'][i%14],tension:.3,borderWidth:1.5,pointRadius:3,fill:false}))
+      },{plugins:{legend:{labels:{font:{size:7},boxWidth:7}}},scales:{y:{min:0,max:100,ticks:{font:{size:7}}},x:{ticks:{font:{size:7}}}}},660,200);
+      chk(55);
+      sectionHead('Grafik Nilai Per Mapel');
+      doc.addImage(chartImg,'PNG',M,y,CW,50); y+=54;
+    }
+    // Tabel nilai lengkap
+    sectionHead('Tabel Nilai Lengkap');
+    tblHeader(['Mata Pelajaran','Sem 1','Sem 2','Sem 3','Sem 4','Sem 5','Sem 6','Avg','Tren'],[45,16,16,16,16,16,16,18,21]);
+    md.forEach((d,ri)=>{
+      const up=trenAktif(d.vals); const tl=up===null?'—':up?'Naik':'Turun';
+      tblRow([d.mapel,...d.vals.map(v=>v||'—'),d.avg,tl],[45,16,16,16,16,16,16,18,21],ri);
+    });
+    doc.save('rapot-'+CU.name.replace(/\s+/g,'-').toLowerCase()+'.pdf');
+  }
+
+  // ── SISWA PER SEMESTER ──
+  else if(pdfType==='siswa-sem'){
+    pdfHeader('Analisis Per Semester — '+CU.name);
+    const grades = await dbGetGrades(CU.id);
+    const mapel = await dbGetMapel();
+    for(let si=0;si<6;si++){
+      const semData=mapel.map(m=>({mapel:m,val:grades[m]?grades[m][si]:0})).filter(d=>d.val>0);
+      if(!semData.length) continue;
+      const avg=Math.round(semData.reduce((a,b)=>a+b.val,0)/semData.length);
+      sectionHead('Semester '+(si+1)+' — Rata-rata: '+avg+' — '+semData.length+' Mata Pelajaran');
+      tblHeader(['Mata Pelajaran','Nilai','Keterangan'],[80,30,60]);
+      semData.sort((a,b)=>b.val-a.val).forEach((d,ri)=>{
+        const ket=d.val>=80?'Baik':d.val>=70?'Cukup':'Perlu Peningkatan';
+        tblRow([d.mapel,d.val,ket],[80,30,60],ri);
+      });
+      y+=4;
+    }
+    doc.save('analisis-semester-'+CU.name.replace(/\s+/g,'-').toLowerCase()+'.pdf');
+  }
+
+  // ── SISWA PER MAPEL ──
+  else if(pdfType==='siswa-mapel'){
+    pdfHeader('Analisis Per Mapel — '+CU.name);
+    const grades = await dbGetGrades(CU.id);
+    const md = await getSiswaMapelData(CU.id);
+    for(const d of md){
+      const avg=d.avg, vals=d.vals;
+      const aktif=vals.filter(v=>v>0);
+      const up=trenAktif(vals);
+      chk(55);
+      sectionHead(d.mapel+' — Rata-rata: '+avg+' — Tren: '+(up===null?'—':up?'↑ Naik':'↓ Turun'));
+      // Info semester
+      doc.setFontSize(8);
+      SEMS_LABEL.forEach((s,i)=>{
+        const x=M+i*(CW/6);
+        doc.setFont('helvetica','normal'); doc.setTextColor(90,90,120);
+        doc.text(s,x+2,y+4);
+        doc.setFont('helvetica','bold');
+        doc.setTextColor(vals[i]===0?180:vals[i]>=80?14:vals[i]>=70?26:192, vals[i]===0?180:vals[i]>=80?124:vals[i]>=70?111:57, vals[i]===0?180:vals[i]>=80?91:vals[i]>=70?219:43);
+        doc.text(vals[i]?String(vals[i]):'—',x+2,y+9);
+        doc.setTextColor(30,30,30);
+      });
+      y+=13;
+      // Mini chart
+      const chartImg = await renderChartToImage('line',{
+        labels:SEMS_LABEL,
+        datasets:[{label:d.mapel,data:vals.map(v=>v||null),borderColor:'#1a6fdb',backgroundColor:'rgba(26,111,219,.1)',tension:.4,borderWidth:2.5,pointRadius:5,fill:true}]
+      },{plugins:{legend:{display:false}},scales:{y:{min:Math.max(0,(Math.min(...aktif)||0)-15),max:Math.min(100,(Math.max(...aktif)||100)+10),ticks:{font:{size:8}}},x:{ticks:{font:{size:8}}}}},660,140);
+      chk(38);
+      doc.addImage(chartImg,'PNG',M,y,CW,36); y+=40;
+    }
+    doc.save('analisis-mapel-'+CU.name.replace(/\s+/g,'-').toLowerCase()+'.pdf');
+  }
 }
 
 // ════════════════════════════════
